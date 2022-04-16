@@ -1,3 +1,17 @@
+Config = {}
+
+Config.maxcarry = 50  
+Config.webhookavatar = "https://cdn3.iconfinder.com/data/icons/hand/500/Hand_give_thumbs_finger-512.png"
+Config.webhook = "https://discord.com/api/webhooks/952537644259221544/EdqpLMoDJJx0b-eXJJn3m4cOUhktW21YY2nr-8pq8XEbsMZYEYbL8t6LO5dIzavr9tzE"
+Config.discordid = false -- turn to true if ur using discord whitelist 
+Language = {
+    gaveitem = "item transfer",
+    gave = " transfered ",
+    to = " to ",
+    withid = "      with the weapon ID: ",
+}
+-- for now just for the tests then we clean it up
+
 Config = {
     defaultlang = "en_lang",
     OpenKey = 0xC1989F95,
