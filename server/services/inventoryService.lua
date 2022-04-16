@@ -20,7 +20,6 @@ InventoryService.DropMoney = function (amount)
 		TriggerClientEvent("vorp:TipRight", _source, _U("NotEnoughMoney"), 3000)
 	else
 		userCharacter.removeCurrency(0, amount)
-		TriggerClientEvent("vorp_inventory:updateStatus", _source, userCharacter.money - amount, userCharacter.gold)
 
 		TriggerClientEvent("vorpInventory:createMoneyPickup", _source, amount)
 	end
@@ -34,7 +33,6 @@ InventoryService.DropAllMoney = function ()
 	if userMoney > 0 then
 		userCharacter.removeCurrency(0, userMoney)
 
-		TriggerClientEvent("vorp_inventory:updateStatus", _source, 0, userCharacter.gold)
 		TriggerClientEvent("vorp:createMoneyPickup", _source, sourceMoney)
 	end
 end
@@ -59,9 +57,6 @@ InventoryService.giveMoneyToPlayer = function (target, amount)
 	else
 		sourceCharacter.removeCurrency(0, amount)
 		targetCharacter.addCurrency(0, amount)
-
-		TriggerClientEvent("vorp_inventory:updateStatus", _source, sourceCharacter.money - amount, sourceCharacter.gold)
-		TriggerClientEvent("vorp_inventory:updateStatus", _target, targetCharacter.money + amount, targetCharacter.gold)
 		
 		TriggerClientEvent("vorp:TipRight", _source, string.format(_U("YouPaid"), amount, targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
 		TriggerClientEvent("vorp:TipRight", _target, string.format(_U("YouReceived"), amount, sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
@@ -231,7 +226,6 @@ InventoryService.onPickup = function (obj)
 					end
 				end
 
-				print('going to give item to player')
 				InventoryService.addItem(_source, name, amount)
 
 				TriggerClientEvent("vorpInventory:sharePickUpClient", _source, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
@@ -278,9 +272,6 @@ InventoryService.onPickupMoney = function (obj)
 		TriggerClientEvent("vorpInventory:removePickupClient", _source, moneyObj)
 		TriggerClientEvent("vorpInventory:playerAnim", _source, moneyObj)
 		TriggerEvent("vorp:addMoney", _source, 0, moneyAmount)
-
-		local userCharacter = Core.getUser(_source).getUsedCharacter
-		TriggerClientEvent("vorp_inventory:updateStatus", _source, userCharacter.money, userCharacter.gold)
 
 		MoneyPickUps[obj] = nil
 	end
@@ -453,11 +444,4 @@ InventoryService.getInventory = function ()
 			TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 		end
 	end)
-end
-
-InventoryService.getStatus = function () 
-	local _source = source
-	local userCharacter = Core.getUser(_source).getUsedCharacter
-
-	TriggerClientEvent("vorp_inventory:updateStatus", _source, userCharacter.money, userCharacter.gold)
 end

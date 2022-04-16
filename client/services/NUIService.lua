@@ -39,10 +39,6 @@ NUIService.CloseInventory = function ()
 	InInventory = false
 end
 
-NUIService.UpdateStatusHud = function (money, gold)
-	SendNUIMessage({action= "updateStatusHud", money= tonumber(money), gold= tonumber(gold)})
-end
-
 NUIService.OpenHorseInventory = function (horseName, horseId)
 	SetNuiFocus(true, true)
 	SendNuiMessage({action= "display", type= "horse", title= horseName, horseid= horseId})

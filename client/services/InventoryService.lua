@@ -97,8 +97,6 @@ InventoryService.onSelectedCharacter = function (charId)
 	TriggerServerEvent("vorpinventory:getItemsTable")
 	Wait(300)
 	TriggerServerEvent("vorpinventory:getInventory")
-	Wait(300)
-	TriggerServerEvent("vorpinventory:getStatus")
 end
 
 InventoryService.processItems = function (items)

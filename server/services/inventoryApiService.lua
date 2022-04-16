@@ -140,7 +140,7 @@ InventoryAPI.getInventory = function (cb)
 	local _source = source
 	local identifier = GetPlayerIdentifiers(_source)[1]
 
-	if next(UsersInventories[identifier]) ~= nil then
+	if UsersInventories[identifier] ~= nil then
 		local playerItems = {}
 
 		for _, item in pairs(UsersInventories[identifier]) do

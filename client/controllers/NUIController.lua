@@ -18,9 +18,6 @@ AddEventHandler("vorp_inventory:ProcessingReady", NUIService.setProcessingPayFal
 RegisterNetEvent("vorp_inventory:CloseInv")
 AddEventHandler("vorp_inventory:CloseInv", NUIService.CloseInventory)
 
-RegisterNetEvent("vorp_inventory:updateStatus")
-AddEventHandler("vorp_inventory:updateStatus", NUIService.UpdateStatusHud)
-
 -- Horse Module
 RegisterNetEvent("vorp_inventory:OpenHorseInventory")
 AddEventHandler("vorp_inventory:OpenHorseInventory", NUIService.OpenHorseInventory)

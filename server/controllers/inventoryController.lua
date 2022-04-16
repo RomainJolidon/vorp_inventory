@@ -4,9 +4,6 @@ AddEventHandler("vorpinventory:getItemsTable", InventoryService.getItemsTable)
 RegisterServerEvent("vorpinventory:getInventory")
 AddEventHandler("vorpinventory:getInventory", InventoryService.getInventory)
 
-RegisterServerEvent("vorpinventory:getStatus") -- Get update of money and gold. Status is only get from vorp_inventory evevents. money transaction outside script will not update status in Hud
-AddEventHandler("vorpinventory:getStatus", InventoryService.getStatus)
-
 RegisterServerEvent("vorpinventory:serverGiveItem")
 AddEventHandler("vorpinventory:serverGiveItem", InventoryService.GiveItem)
 
