@@ -10,7 +10,7 @@ Item.canRemove = false
 
 
 function Item:setCount(amount)
-	self.count = count
+	self.count = amount
 end
 
 function Item:getCount()

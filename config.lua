@@ -6,6 +6,10 @@ Config = {
         Weapons = false,
         Items = false
     },
+    maxcarry = 200,
+    webhookavatar = "https://cdn3.iconfinder.com/data/icons/hand/500/Hand_give_thumbs_finger-512.png",
+    webhook = "",
+    discordid = true, -- turn to true if ur using discord whitelist 
     MaxItemsInInventory = {
         Weapons = 900,
         Items = 132

@@ -79,7 +79,7 @@ end
 InventoryService.SaveInventoryItemsSupport = function () 
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local indentifier = sourceCharacter.identifier
+	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 	local characterInventory = {}
 
@@ -114,8 +114,8 @@ InventoryService.usedWeapon = function (id, _used, _used2)
 	end)
 end
 
-InventoryService.subItem = function (source, name, amount) 
-	local _source = source 
+InventoryService.subItem = function (target, name, amount) 
+	local _source = target 
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
@@ -133,8 +133,8 @@ InventoryService.subItem = function (source, name, amount)
 	end
 end
 
-InventoryService.addItem = function (source, name, amount) 
-	local _source = source
+InventoryService.addItem = function (target, name, amount) 
+	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
@@ -161,8 +161,8 @@ InventoryService.addItem = function (source, name, amount)
 	end
 end
 
-InventoryService.addWeapon = function (source, weaponId) 
-	local _source = source
+InventoryService.addWeapon = function (target, weaponId) 
+	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
@@ -171,15 +171,15 @@ InventoryService.addWeapon = function (source, weaponId)
 		UsersWeapons[weaponId]:setPropietary(identifier)
 		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
 			['identifier'] = identifier, 
-			['charid'] = used2,
+			['charid'] = charId,
 			['id'] = weaponId
 		}, function() 
 		end)
 	end
 end
 
-InventoryService.subWeapon = function (source, weaponId) 
-	local _source = source 
+InventoryService.subWeapon = function (target, weaponId) 
+	local _source = target 
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
@@ -188,8 +188,8 @@ InventoryService.subWeapon = function (source, weaponId)
 		UsersWeapons[weaponId]:setPropietary('')
 		
 		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
-			['identifier'] = UsersWeapons[weaponId]:getPropietary(),
-			['charid'] = charidentifier,
+			['identifier'] = identifier,
+			['charid'] = charId,
 			['id'] = weaponId
 		}, function() end)
 	end
@@ -208,7 +208,6 @@ InventoryService.onPickup = function (obj)
 		if ItemPickUps[obj].weaponid == 1 then
 
 			if next(UsersInventories[identifier]) ~= nil then
-
 				if svItems[name]:getLimit() ~= -1 then
 				
 					if next(UsersInventories[identifier][name]) ~= nil then
@@ -222,21 +221,22 @@ InventoryService.onPickup = function (obj)
 					end
 				end
 
-				if Config.MaxItems ~= 0 then
+				if Config.MaxItemsInInventory.Items ~= 0 then
 					local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier)
 					sourceInventoryItemCount = sourceInventoryItemCount + amount 
 
-					if sourceInventoryItemCount > Config.MaxItems then
+					if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
 						TriggerClientEvent("vorp:TipRight", _source, _U(fullInventory), 2000)
 						return
 					end
 				end
 
-				InventoryService.addItem(name, amount)
+				print('going to give item to player')
+				InventoryService.addItem(_source, name, amount)
 
-				TriggerClientEvent("vorpInventory:sharePickUpClient", -1, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
+				TriggerClientEvent("vorpInventory:sharePickUpClient", _source, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
 
-				TriggerClientEvent("vorpInventory:removePickUpClient", -1, ItemPickUps[obj].obj)
+				TriggerClientEvent("vorpInventory:removePickupClient", _source, ItemPickUps[obj].obj) -- FIXME cache probleme mdr
 
 				TriggerClientEvent("vorpInventory:receiveItem", _source, name, amount)
 
@@ -245,11 +245,11 @@ InventoryService.onPickup = function (obj)
 				ItemPickUps[obj] = nil
 			end
 		else
-			if Config.MaxWeapons ~= 0 then
+			if Config.MaxItemsInInventory.Weapons ~= 0 then
 				local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId)
 				sourceInventoryWeaponCount = sourceInventoryWeaponCount + 1
 
-				if sourceInventoryWeaponCount <= Config.MaxWeapons then
+				if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.Weapon then
 					local weaponId = ItemPickUps[obj].weaponId
 					local weaponObj = ItemPickUps[obj].obj
 					InventoryService.addWeapon(weaponId)
@@ -319,9 +319,9 @@ InventoryService.DropWeapon = function (weaponId)
 	TriggerClientEvent("vorpInventory:createPickup", _source, UsersWeapons[weaponId]:getName(), 1, weaponId)
 end
 
-InventoryService.DropItem = function (source, itemName, amount)
+InventoryService.DropItem = function (itemName, amount)
 	local _source = source 
-	InventoryService.subItem(itemName, amount)
+	InventoryService.subItem(_source, itemName, amount)
 	TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, 1)
 end
 
@@ -403,7 +403,7 @@ InventoryService.getInventory = function ()
 		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
 
 			if sourceInventory[item.item] ~= nil then
-				local newItem = Items:New({
+				local newItem = Item:New({
 					count = tonumber(sourceInventory[item.item]),
 					limit = item.limit,
 					label = item.label,

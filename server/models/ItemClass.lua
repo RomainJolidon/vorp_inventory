@@ -15,104 +15,104 @@ Item.canRemove = false
 Item.dropOnDeath = false 
 
 -- NAME
-Item.setName = function (name) 
+function Item:setName(name) 
 	self.name = name
 end
 
-Item.getName = function () 
+function Item:getName() 
 	return self.name
 end
 
 -- LABEL
-Item.setLabel = function (label) 
+function Item:setLabel(label) 
 	self.label = label
 end
 
-Item.getLabel = function () 
+function Item:getLabel() 
 	return self.label
 end
 
 -- TYPE
-Item.setType = function (type) 
+function Item:setType(type) 
 	self.type = type
 end
 
-Item.getType = function () 
+function Item:getType() 
 	return self.type
 end
 
 -- Model
-Item.setModel = function (model)
+function Item:setModel(model)
 	self.model = model
 end
 
-Item.getModel = function ()
+function Item:getModel()
 	return self.model
 end
 
 -- COUNT
-Item.setCount = function (amount) 
+function Item:setCount(amount) 
 	self.count = amount
 end
 
-Item.getCount = function () 
+function Item:getCount() 
 	return self.count
 end
 
-Item.addCount = function (amount) 
-	if self.count + amount <= limit then
+function Item:addCount(amount) 
+	if self.count + amount <= self.limit then
 		self.count = self.count + amount
 		return true
 	end
 	return false
 end
 
-Item.quitCount = function (amount) 
+function Item:quitCount(amount) 
 	self.count = self.count - amount
 end
 
 -- LIMIT
-Item.setLimit = function (limit) 
+function Item:setLimit(limit) 
 	self.limit = limit
 end
 
-Item.getLimit = function () 
+function Item:getLimit() 
 	return self.limit
 end
 
 -- WEIGHT
-Item.setWeight = function (weight)
+function Item:setWeight(weight)
 	self.weight = weight
 end
 
-Item.getWeight = function ()
+function Item:getWeight()
 	return self.weight
 end
 
 -- CanUse
-Item.setCanUse = function (canUse) 
+function Item:setCanUse(canUse) 
 	self.canUse = canUse
 end
 
-Item.getCanUse = function () 
+function Item:getCanUse() 
 	return self.canUse
 end
 
 -- CanRemove
-Item.setCanRemove = function (canRemove) 
+function Item:setCanRemove(canRemove) 
 	self.canRemove = canRemove
 end
 
-Item.getCanRemove = function () 
+function Item:getCanRemove() 
 	return self.canRemove
 end
 
 -- DropOnDeath
-Item.setDropOnDeath = function (dropOnDeath)
+function Item:setDropOnDeath(dropOnDeath)
 	self.dropOnDeath = dropOnDeath
 end
 
-Item.getDropOnDeath = function ()
+function Item:getDropOnDeath()
 	return self.dropOnDeath
 end
  

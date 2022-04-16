@@ -12,9 +12,9 @@ local lastCoords = {}
 
 PickupsService.createPickup = function (name, amount, weaponId)
 	local playerPed = PlayerPedId()
-	local coords = Citizen.InvokeNative(0xA86D5F069399F44D, playerPed, true, true)
-	local forward = Citizen.InvokeNative(0x2412D9C05BB09B97, playerPed)
-	local position = (coords + forward * 1.6)
+	local coords = GetEntityCoords(playerPed, true, true)
+	local forward = GetEntityForwardVector(playerPed)
+	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
 	local pickupModel = GetHashKey("P_COTTONBOX01X")
 
 
@@ -104,6 +104,7 @@ PickupsService.shareMoneyPickupClient = function (obj, amount, position, value)
 end
 
 PickupsService.removePickupClient = function (obj)
+	print('coucou')
 	Citizen.InvokeNative(0xDC19C288082E586E, obj, false, true)
 	local timeout = 0
 
@@ -216,21 +217,21 @@ PickupsService.principalFunctionsPickups = function ()
 			TaskLookAtEntity(playerPed, pickup.obj, 3000, 2048, 3)
 
 			if not active then
-				UipromptSetEnabled(PickPrompt, true)
-				UipromptSetVisible(PickPrompt, true)
+				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, true)
+				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, true)
 				active = true
 			end
 			
-			if UipromptHasHoldModeCompleted(PickPrompt) then
+			if Citizen.InvokeNative(0xE0F65F0640EF0617, PickPrompt) then
 				TriggerServerEvent("vorpinventory:onPickup", pickup.obj)
 				pickup.inRange = true
-				UipromptSetEnabled(PickPrompt, false)
-				UipromptSetVisible(PickPrompt, false)
+				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
+				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
 			end
 		else
 			if active then
-				UipromptSetEnabled(PickPrompt, false)
-				UipromptSetVisible(PickPrompt, false)
+				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
+				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
 				active = false
 			end
 		end

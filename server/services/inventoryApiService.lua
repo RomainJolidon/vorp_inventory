@@ -175,7 +175,8 @@ InventoryAPI.useItem = function (source, itemName, args)
 end
 
 InventoryAPI.registerUsableItem = function (name, cb)
-	cb(UsableItemsFunctions[name])
+	UsableItemsFunctions[name] = cb
+
 	print(GetCurrentResourceName() .. ": Function callback of item: "..name.. " registered!")
 end
 
@@ -346,7 +347,7 @@ InventoryAPI.addItem = function (name, amount)
 	local itemUsable = UsersInventories[identifier][name]:getLimit()
 	local itemCanRemove = UsersInventories[identifier][name]:getCanRemove()
 
-	TriggerClientEvent("vorpCoreClient:addItem", _source, amount, itemLimit, itemLabel, itemName, itemType, itemUsable, itemCanRemove)
+	TriggerClientEvent("vorpCoreClient:addItem", _source, amount, itemLimit, itemLabel, name, itemType, itemUsable, itemCanRemove)
 	InventoryAPI.SaveInventoryItemsSupport(_source)
 end
 
@@ -499,7 +500,7 @@ end
 InventoryAPI.getUserTotalCount = function (identifier)
 	local userTotalItemCount = 0
 	for _, item in pairs(UsersInventories[identifier]) do
-		userTotalItemCount = userTotalItemCount + item.getCount()
+		userTotalItemCount = userTotalItemCount + item:getCount()
 	end
 	return userTotalItemCount
 end
@@ -507,7 +508,7 @@ end
 InventoryAPI.getUserTotalCountWeapons = function (identifier, charId)
 	local userTotalWeaponCount = 0
 	for _, weapon in pairs(UsersWeapons) do
-		if weapon.getPropietary() == identifier and weapon.getCharId() == charid then
+		if weapon:getPropietary() == identifier and weapon:getCharId() == charId then
 			userTotalWeaponCount = userTotalWeaponCount + 1
 		end
 	end

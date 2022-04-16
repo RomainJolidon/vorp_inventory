@@ -224,18 +224,18 @@ NUIService.NUIDropItem = function (obj)
 	local aux = Utils.expandoProcessing(obj)
 	local itemName = aux.item
 	local type = aux.type
+	local qty = tonumber(aux.number)
 
 	if type == "item_money" then
-		TriggerServerEvent("vorpinventory:serverDropMoney", tonumber(aux.number))
+		TriggerServerEvent("vorpinventory:serverDropMoney", qty)
 	end
 
 	if type == "item_standard" then
 		if aux.number ~= nil and aux.number ~= '' then
-			if aux.number > 0 and UserInventory[itemName]:getCount() >= tonumber(aux.number) then
-				TriggerServerEvent("vorpinventory:serverDropItem", itemName, aux.number, 1)
-				UserInventory[itemName]:quitCount(aux.number)
-
-				if UserInventory[itemName]:getcount() == 0 then
+			if  qty > 0 and UserInventory[itemName]:getCount() >= qty then
+				TriggerServerEvent("vorpinventory:serverDropItem", itemName, qty)
+				UserInventory[itemName]:quitCount(qty)
+				if UserInventory[itemName]:getCount() == 0 then
 					UserInventory[itemName] = nil
 				end
 			end

@@ -8,7 +8,7 @@ local LoadDatabase = function ()
 		if next(result) ~= nil then
 			DB_Items = result
 			for _, db_item in pairs(result) do
-				local item = Items:New({
+				local item = Item:New({
 					item = db_item.item,
 					label = db_item.label,
 					limit = db_item.limit,
@@ -16,8 +16,7 @@ local LoadDatabase = function ()
 					canUse = db_item.canUse ,
 					canRemove = db_item.canRemove
 				})
-				table.insert(svItems, item)
-				--svItems[item.item] = item
+				svItems[item.item] = item
 				--DB_Items[item.item] = item
 			end
 		end

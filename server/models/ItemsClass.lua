@@ -7,39 +7,39 @@ Items.canUse = false
 Items.canRemove = false
 Items.type = nil
 
-Items.getName = function ()
+function Items:getName()
 	return self.item
 end
 
-Items.getLabel = function () 
+function Items:getLabel() 
 	return self.label
 end
 
 -- TYPE
-Items.setType = function (type) 
+function Items:setType(type) 
 	self.type = type
 end
 
-Items.getType = function () 
+function Items:getType() 
 	return self.type
 end
 
 -- LIMIT
-Items.getLimit = function () 
+function Items:getLimit() 
 	return self.limit
 end
 
 -- CanUse
-Items.setCanUse = function (canUse) 
+function Items:setCanUse(canUse) 
 	self.canUse = canUse
 end
 
-Items.getCanUse = function () 
+function Items:getCanUse() 
 	return self.canUse
 end
 
 -- CanRemove
-Items.getCanRemove = function () 
+function Items:getCanRemove() 
 	return self.canRemove
 end
 
