@@ -14,9 +14,5 @@ Locales["en_lang"] = {
     YouReceiveditem   = "You have received an item ",
     yougaveitem       = "You have gave an item ",
     itemerror         = "Invalid ",
-    gaveitem          = "item transfer",
-    gave              = " transfered ",
-    to                = " to ",
-    withid            = " with the weapon ID: "
 }
 

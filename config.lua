@@ -3,6 +3,8 @@
 -- VORP INVENTORY LUA*
 
 Config  = {
+
+  Debug = true,
   
   defaultlang = "en_lang",
 

@@ -73,8 +73,8 @@ RegisterServerEvent("vorpinventory:itemlog")
 AddEventHandler("vorpinventory:itemlog", function(_source,targetHandle,itemName, amount)
     local name = GetPlayerName(_source)
     local name2 = GetPlayerName(targetHandle)
-    local description = name.._U("gave")..amount.." "..itemName.._U("to")..name2
-    Discord(_U("gaveitem"),_source,description)
+    local description = name..Config.Language.gave..amount.." "..itemName..Config.Language.to..name2
+    Discord(Config.Language.gaveitem,_source,description)
 end)
 
 RegisterServerEvent("vorpinventory:weaponlog")
@@ -82,16 +82,16 @@ AddEventHandler("vorpinventory:weaponlog", function(targetHandle, data)
     local _source = source
     local name = GetPlayerName(_source)
     local name2 = GetPlayerName(targetHandle)
-    local description = name.._U("gave")..data.item.._U("to")..name2.._U("withid")..data.id
-    Discord(_U("gaveitem"),_source,description) 
+    local description = name..Config.Language.gave..data.item..Config.Language.to..name2..Config.Language.withid..data.id
+    Discord(Config.Language.gaveitem,_source,description) 
 end)
 
 RegisterServerEvent("vorpinventory:moneylog")
 AddEventHandler("vorpinventory:moneylog", function(_source,targetHandle, amount)
     local name = GetPlayerName(_source)
     local name2 = GetPlayerName(targetHandle)
-    local description = name.._U("gave").." $"..amount.." ".._U("to")..name2
-    Discord(_U("gaveitem"),_source,description)
+    local description = name..Config.Language.gave.." $"..amount.." "..Config.Language.to..name2
+    Discord(Config.Language.gaveitem,_source,description)
 end)
 
 function Discord(title,_source,description)

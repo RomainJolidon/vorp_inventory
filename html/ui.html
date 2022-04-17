@@ -680,17 +680,17 @@
 
             window.addEventListener("message", function(event) {
                
-                /*if (event.data.action == "changecheck") {
+                if (event.data.action == "changecheck") {
                     checkxy = event.data.check
                     infoxy = event.data.info
                     $('#check').html('')
                     $("#check").append(`<button id='check'>${checkxy}/${infoxy}</button>`);
-                }*/
+                }
                 if (event.data.action == "display") {
                     $("#inventoryHud").fadeIn();
                     $(".controls").remove();
 
-                    $("#inventoryHud").append(`<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='search'/></div><button id='close'>Close</button></div></div>`);
+                    $("#inventoryHud").append(`<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='search'/><button id='check'>${checkxy}/${infoxy}</button></div><button id='close'>Close</button></div></div>`);
 
                     $("#search").bind('input', function() {
                         searchFor = $("#search").val().toLowerCase();
