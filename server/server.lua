@@ -45,7 +45,7 @@ AddEventHandler("vorpinventory:check_slots", function()
     slot_check = 0
     end
     local stufftosend = tonumber(slot_check)
-    local part2 = Config.maxcarry 
+    local part2 = Config.MaxItemsInInventory.Items
     local User = VorpCore.getUser(_source).getUsedCharacter
     local money = User.money
     local gold = User.gold
