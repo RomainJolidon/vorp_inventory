@@ -356,7 +356,7 @@ InventoryService.GiveItem = function (itemName, amount, target)
 		return
 	end
 
-	if targetItemAmount + amount > targetItemLimit or targetInventoryItemCount + amount > Config.MaxItems then
+	if targetItemAmount + amount > targetItemLimit or targetInventoryItemCount + amount > Config.MaxItemsInInventory.Items then
 		TriggerClientEvent("vorp:TipRight", _source, _U('fullinventory'), 2000)
 		TriggerClientEvent("vorp:TipRight", _target, _U('fullinventory'), 2000)
 		return

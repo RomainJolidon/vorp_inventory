@@ -43,16 +43,12 @@ Config  = {
  
   -- FIRST JOIN
   startItems  = {
-    {
-      consumable_raspberrywater = 2, --ITEMS SAME NAME AS IN DATABASE
-      ammorevolvernormal = 1 --AMMO SAME NAME AS I NTHE DATABASE
-    }
+    consumable_raspberrywater = 2, --ITEMS SAME NAME AS IN DATABASE
+    ammorevolvernormal = 1 --AMMO SAME NAME AS I NTHE DATABASE
   },
 
   startWeapons = {
-    {
-      WEAPON_MELEE_KNIFE = {{}} --WEAPON HASH NAME
-    }
+    WEAPON_MELEE_KNIFE = {{}} --WEAPON HASH NAME
   },
 
 

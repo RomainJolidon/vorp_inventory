@@ -31,8 +31,8 @@ InventoryAPI.canCarryAmountWeapons = function (amount, cb)
 	local charId = sourceCharacter.charidentifier
 	local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + amount
 
-	if Config.MaxWeapons ~= -1 then
-		if sourceInventoryWeaponCount <= Config.MaxWeapons then
+	if Config.MaxItemsInInventory.ItemsInInventory.Weapons ~= -1 then
+		if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.ItemsInInventory.Weapons then
 			cb(true)
 		else
 			cb(false)
@@ -46,9 +46,9 @@ InventoryAPI.canCarryAmountItem = function (amount, cb)
 	local _source = source
 	local identifier = GetPlayerIdentifiers(_source)[1]
 
-	if next(UsersInventories[identifier]) ~= nil and Config.MaxItems ~= -1 then
+	if next(UsersInventories[identifier]) ~= nil and Config.MaxItemsInInventory.ItemsInInventory.Items ~= -1 then
 		local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
-		if sourceInventoryItemCount <= Config.MaxItems then
+		if sourceInventoryItemCount <= Config.MaxItemsInInventory.ItemsInInventory.Items then
 			cb(true)
 		else
 			cb(false)
@@ -72,10 +72,10 @@ InventoryAPI.canCarryItem = function (itemName, amount, cb)
 					local total = count + amount
 					
 					if total <= limit then
-						if config.MaxItems ~= -1 then
+						if Config.MaxItemsInInventory.ItemsInInventory.Items ~= -1 then
 							local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
 
-							if sourceInventoryItemCount <= Config.MaxItems then
+							if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
 								cb(true)
 							else
 								cb(false)
@@ -88,10 +88,10 @@ InventoryAPI.canCarryItem = function (itemName, amount, cb)
 					end
 				else
 					if amount <= limit then
-						if Config.MaxItems ~= -1 then
+						if Config.MaxItemsInInventory.Items ~= -1 then
 							local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
 
-							if sourceInventoryItemCount <= Config.MaxItems then
+							if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
 								cb(true)
 							else
 								cb(false)
@@ -105,10 +105,10 @@ InventoryAPI.canCarryItem = function (itemName, amount, cb)
 				end
 			else
 				if amount <= limit then
-					if Config.MaxItems ~= -1 then
+					if Config.MaxItemsInInventory.Items ~= -1 then
 						local totalAmount = amount
 
-						if totalAmount <= Config.MaxItems then
+						if totalAmount <= Config.MaxItemsInInventory.Items then
 							cb(true)
 						else
 							cb(false)
@@ -121,10 +121,10 @@ InventoryAPI.canCarryItem = function (itemName, amount, cb)
 				end
 			end
 		else
-			if Config.MaxItems ~= -1 then
+			if Config.MaxItemsInInventory.Items ~= -1 then
 				local totalAmount = InventoryAPI.getUserTotalCount(identifier) + amount
 
-				if totalAmount <= Config.MaxItems then
+				if totalAmount <= Config.MaxItemsInInventory.Items then
 					cb(true)
 				else
 					cb(false)
@@ -296,7 +296,7 @@ InventoryAPI.addItem = function (name, amount)
 	local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
 	
 	if next(UsersInventories[identifier][name]) == nil then 
-		if amount > sourceItemLimit and sourceInventoryItemCount > Config.MaxItems and Config.MaxItems ~= 0 and svItems[sourceItemLimit] ~= -1 then
+		if amount > sourceItemLimit and sourceInventoryItemCount > Config.MaxItemsInInventory.Items and Config.MaxItemsInInventory.Items ~= 0 and svItems[sourceItemLimit] ~= -1 then
 			return
 		else
 			local itemLabel = svItems[name]:getLabel()
@@ -326,8 +326,8 @@ InventoryAPI.addItem = function (name, amount)
 		return
 	end
 
-	if Config.MaxItems ~= 0 then
-		if sourceInventoryItemCount > Config.MaxItems then
+	if Config.MaxItemsInInventory.Items ~= 0 then
+		if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
 			return
 		end
 	end
@@ -393,10 +393,10 @@ InventoryAPI.registerWeapon = function (target, name, ammos)
 		targetCharId = targetUser.charIdentifier
 	end
 
-	if Config.MaxWeapons ~= 0 then
+	if Config.MaxItemsInInventory.Weapons ~= 0 then
 		local targetTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(targetIdentifier, targetCharId) + 1
 
-		if targetTotalWeaponCount > Config.MaxWeapons then
+		if targetTotalWeaponCount > Config.MaxItemsInInventory.Weapons then
 			print(targetCharacter.firstname .. " " .. targetCharacter.lastname .. " Can't carry more weapons")
 			return
 		end
@@ -450,10 +450,10 @@ InventoryAPI.giveWeapon = function (weaponId, target)
 		targetCharId = targetCharacter.charIdentifier
 	end
 
-	if Config.MaxWeapons ~= 0 then
+	if Config.MaxItemsInInventory.Weapons ~= 0 then
 		local sourceTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId) + 1
 
-		if sourceTotalWeaponCount > Config.MaxWeapons then
+		if sourceTotalWeaponCount > Config.MaxItemsInInventory.Weapons then
 			print(sourceCharacter.firstname .. " " .. sourceCharacter.lastname .. " Can't carry more weapons")
 			return
 		end
@@ -513,4 +513,52 @@ InventoryAPI.getUserTotalCountWeapons = function (identifier, charId)
 		end
 	end
 	return userTotalWeaponCount
+end
+
+InventoryAPI.onNewCharacter = function (playerId)
+	Wait(5000)
+	local player = Core.getUser(playerId)
+
+	if player == nil then
+		print("Player " .. playerId .. "was not found")
+		return
+	end
+
+	local identifier = player.getIdentifier()
+
+	-- Attempt to add all starter items/weapons from the Config.lua
+	for key, value in pairs(Config.startItems) do
+		TriggerEvent("vorpCore:addItem", tostring(key), tonumber(value))
+	end
+
+	for key, value in pairs(Config.startWeapons) do
+		local auxBullets = {}
+		local receivedBullets = {}
+		local weaponConfig = nil
+
+		for _, wpc in pairs(Config.Weapons) do
+			if wpc.HashName == key then
+				weaponConfig = wpc
+				break
+			end
+		end
+
+		if weaponConfig ~= nil then
+			local ammoHash = weaponConfig["AmmoHash"]
+
+			if ammoHash ~= nil then
+				for ammohashKey, ammohashValue in pairs(ammoHash) do
+					auxBullets[ammohashKey] = ammohashValue
+				end
+			end
+		end
+
+		for bulletKey, bulletValue in pairs(value) do
+			if auxBullets[bulletKey] ~= nil then
+				receivedBullets[bulletKey] = tonumber(bulletValue)
+			end
+		end
+
+		TriggerEvent("vorpCore:registerWeapon", playerId, key, receivedBullets)
+	end
 end

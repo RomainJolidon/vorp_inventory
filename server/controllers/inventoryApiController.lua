@@ -48,3 +48,7 @@ AddEventHandler("vorpCore:registerUsableItem", InventoryAPI.registerUsableItem)
 
 RegisterServerEvent("vorp_inventory:useItem")
 AddEventHandler("vorp_inventory:useItem", InventoryAPI.useItem)
+
+RegisterServerEvent("vorp_NewCharacter")
+AddEventHandler("vorp_NewCharacter", InventoryAPI.onNewCharacter)
+
