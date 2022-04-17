@@ -12,7 +12,6 @@
 <body>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript" src="js/config.js"></script>
-    <script type="text/javascript" src="js/script.js"></script>
     <script type="text/javascript" src="js/contextMenu.min.js"></script>
     <script type="text/javascript" src="js/jquery.dialog.min.js"></script>
 
@@ -34,8 +33,10 @@
         <div id="id">
             <a id="id-value"></a>
         </div>
+
+
+
     </div>
-    
     <div id="secondInventoryHud">
         <div id="titleHorse"></div>
         <div id="secondInventoryElement">
@@ -56,8 +57,8 @@
         var disabled = false;
         var disabledFunction = null;
         var ready4Action = true;
-        //let checkxy ;
-        //let infoxy ;
+        let checkxy ;
+        let infoxy ;
         var houseId = 0
         var hideoutid = 0
         var clanid = 0 
@@ -80,24 +81,27 @@
         }
 
         window.addEventListener('message', function (event) {
-            if(event.data.action == "updateStatusHud") {
 
-                if(event.data.money || event.data.money === 0) {
-                    $("#money-value").text(event.data.money.toFixed(2) + " ").css("color" , "#ffffff");
-                
-                }
+        
 
-                if(event.data.gold || event.data.gold === 0) {
-                    $("#gold-value").text(event.data.gold.toFixed(2) + " ").css("color" , "#ffffff");
-                
-                }
+        if(event.data.action == "updateStatusHud") {
 
-                if(event.data.id) {
-                    $("#id-value").text(event.data.id + "ID ").css("color" , "#ffffff");
-                    
-                }
-
+            if(event.data.money) {
+                $("#money-value").text(event.data.money.toFixed(2) + " ");
+               
             }
+
+            if(event.data.gold) {
+                $("#gold-value").text(event.data.gold.toFixed(2) + " ");
+               
+            }
+
+            if(event.data.id) {
+                $("#id-value").text("ID " + event.data.id);
+               
+            }  
+
+        }
         });
 
         $("document").ready(function() {
@@ -680,6 +684,7 @@
 
             window.addEventListener("message", function(event) {
                
+                
                 if (event.data.action == "changecheck") {
                     checkxy = event.data.check
                     infoxy = event.data.info
@@ -690,7 +695,7 @@
                     $("#inventoryHud").fadeIn();
                     $(".controls").remove();
 
-                    $("#inventoryHud").append(`<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='search'/><button id='check'>${checkxy}/${infoxy}</button></div><button id='close'>Close</button></div></div>`);
+                    $("#inventoryHud").append(`<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='search'/><button id='check'>${checkxy} / ${infoxy}</button></div><button id='close'>Close</button></div></div>`);
 
                     $("#search").bind('input', function() {
                         searchFor = $("#search").val().toLowerCase();
