@@ -104,7 +104,6 @@ PickupsService.shareMoneyPickupClient = function (obj, amount, position, value)
 end
 
 PickupsService.removePickupClient = function (obj)
-	print('coucou')
 	Citizen.InvokeNative(0xDC19C288082E586E, obj, false, true)
 	local timeout = 0
 

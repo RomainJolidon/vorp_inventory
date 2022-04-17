@@ -8,7 +8,7 @@ InventoryApiService = {}
 ---@param canUse boolean
 ---@param canRemove boolean
 InventoryApiService.addItem = function (count, limit, label, name, type, canUse, canRemove)
-    if next(UserInventory[name]) ~= nil then
+    if UserInventory[name] ~= nil then
         UserInventory[name]:addCount(count)
     else
         UserInventory[name] = Item:New({
@@ -26,7 +26,7 @@ end
 
 ---@param weaponId number
 InventoryApiService.subWeapon = function (weaponId)
-    if next(UserWeapons[weaponId]) ~= nil then
+    if UserWeapons[weaponId] ~= nil then
         if UserWeapons[weaponId]:getUsed() then
             RemoveWeaponFromPed(PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()),true, 0)
         end
@@ -38,7 +38,7 @@ end
 ---@param name string
 ---@param qty number
 InventoryApiService.subItem = function (name, qty)
-    if next(UserInventory[name]) ~= nil then
+    if UserInventory[name] ~= nil then
         UserInventory[name]:setCount(qty)
         if UserInventory[name]:getCount() == 0 then
             table.remove(UserInventory, name)
@@ -51,7 +51,7 @@ end
 ---@param bulletType string
 ---@param qty number
 InventoryApiService.addWeaponBullets = function (weaponId, bulletType, qty)
-    if next(UserWeapons[weaponId]) ~= nil then
+    if UserWeapons[weaponId] ~= nil then
         UserWeapons[weaponId]:addAmmo(qty, bulletType)
         if UserWeapons[weaponId]:getUsed() then
             SetPedAmmoByType(PlayerPedId(), GetHashKey(bulletType), UserWeapons[weaponId]:getAmmo(bulletType))
@@ -64,7 +64,7 @@ end
 ---@param bulletType string
 ---@param qty number
 InventoryApiService.subWeaponBullets = function (weaponId, bulletType, qty)
-    if next(UserWeapons[weaponId]) ~= nil then
+    if UserWeapons[weaponId] ~= nil then
         UserWeapons[weaponId]:subAmmo(qty, bulletType)
         if UserWeapons[weaponId]:getUsed() then
             SetPedAmmoByType(PlayerPedId(), GetHashKey(bulletType), UserWeapons[weaponId]:getAmmo(bulletType))
@@ -76,7 +76,7 @@ end
 ---@param weaponId number
 ---@param component string
 InventoryApiService.addComponent = function (weaponId, component)
-    if next(UserWeapons[weaponId]) ~= nil then
+    if UserWeapons[weaponId] ~= nil then
         for _,v in pairs(UserWeapons[weaponId]:getAllComponents()) do
             if v == component then
                 return
@@ -95,7 +95,7 @@ end
 ---@param weaponId number
 ---@param component string
 InventoryApiService.subComponent = function (weaponId, component)
-    if next(UserWeapons[weaponId]) ~= nil then
+    if UserWeapons[weaponId] ~= nil then
         for _,v in pairs(UserWeapons[weaponId]:getAllComponents()) do
             if v == component then
                 return

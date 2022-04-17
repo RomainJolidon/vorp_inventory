@@ -40,7 +40,7 @@ exports('vorp_inventoryApi',function()
         return bull
     end
     
-    self.getWeaponComponents = function(source,weaponId)
+    self.getWeaponComponents = function(source,weaponId) -- TODO NOT IMPLEMENTED
         local comp
         TriggerEvent("vorpCore:getWeaponComponents",source,function(components)
             comp = components
@@ -68,7 +68,7 @@ exports('vorp_inventoryApi',function()
         local can
         exports.ghmattimysql:execute( "SELECT limit FROM items WHERE item=@id;", {['@id'] = item}, 
         function(result) 
-            if self.getItemCount(_source, item) + amount <= tonumber(result) then
+            if self.getItemCount(source, item) + amount <= tonumber(result) then
                 can = true
             else
                 can = false
@@ -97,7 +97,7 @@ exports('vorp_inventoryApi',function()
         return inv
     end
 
-    self.CloseInv = function(source)
+    self.CloseInv = function(source) -- TODO NOT IMPLEMENTED
         TriggerClientEvent("vorp_inventory:CloseInv",source)
     end
     

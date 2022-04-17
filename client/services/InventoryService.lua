@@ -39,14 +39,14 @@ InventoryService.updateAmmoInWeapon = function ()
 end
 
 InventoryService.receiveItem = function (name, amount)
-	if next(UserInventory[name]) ~= nil then
+	if UserInventory[name] ~= nil then
 		UserInventory[name]:addCount(amount)
 		NUIService.LoadInv()
 		return
 	end
 	
 	UserInventory[name] = Item:New({
-		count = count,
+		count = amount,
 		limit = DB_Items[name].limit,
 		label = DB_Items[name].name,
 		name = name,
@@ -114,16 +114,12 @@ InventoryService.processItems = function (items)
 end
 
 InventoryService.getLoadout = function (loadout)
-	print(PlayerPedId())
-
 	for _, weapon in pairs(loadout) do
 		local weaponAmmo = json.decode(weapon.ammo)
 
 		for type, amount in pairs(weaponAmmo) do
 			weaponAmmo[type] = tonumber(amount)
 		end
-
-		print(weapon.used)
 
 		local weaponUsed = false
 		local weaponUsed2 = false

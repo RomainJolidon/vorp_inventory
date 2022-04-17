@@ -1,5 +1,5 @@
 RegisterNetEvent("vorpCoreClient:addItem")
-AddEventHandler("vorpCoreClient:adItem", InventoryApiService.addItem)
+AddEventHandler("vorpCoreClient:addItem", InventoryApiService.addItem)
 
 RegisterNetEvent("vorpCoreClient:subItem")
 AddEventHandler("vorpCoreClient:subItem", InventoryApiService.subItem)

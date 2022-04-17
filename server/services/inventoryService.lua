@@ -66,7 +66,7 @@ InventoryService.giveMoneyToPlayer = function (target, amount)
 end
 
 InventoryService.setWeaponBullets = function (weaponId, type, amount) 
-	if next(UsersWeapons[weaponId]) ~= nil then
+	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setAmmo(type, amount)
 	end
 end
@@ -78,12 +78,12 @@ InventoryService.SaveInventoryItemsSupport = function ()
 	local charId = sourceCharacter.charIdentifier
 	local characterInventory = {}
 
-	if next(UsersInventories[identifier]) ~= nil then
+	if UsersInventories[identifier] ~= nil then
 		for _, item in pairs(UsersInventories[identifier]) do
 			characterInventory[_] = item
 		end
 
-		if next(characterInventory) ~= nil then
+		if characterInventory ~= nil then
 			exports.ghmattimysql:execute('UPDATE characters SET inventory = @inventory WHERE identifier = @identifier AND charidentifier = @charid', { 
 					['inventory'] = json.encode(characterInventory), 
 					['identifier'] = identifier,
@@ -114,8 +114,8 @@ InventoryService.subItem = function (target, name, amount)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
-	if next(UsersInventories[identifier]) ~= nil then
-		if next(UsersInventories[identifier][name]) ~= nil then
+	if UsersInventories[identifier] ~= nil then
+		if UsersInventories[identifier][name] ~= nil then
 			if amount <= UsersInventories[identifier][name]:getCount() then
 				UsersInventories[identifier][name]:quitCount(amount)
 			end
@@ -133,14 +133,14 @@ InventoryService.addItem = function (target, name, amount)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
-	if next(UsersInventories[identifier]) ~= nil then
-		if next(UsersInventories[identifier][name]) ~= nil then
+	if UsersInventories[identifier] ~= nil then
+		if UsersInventories[identifier][name] ~= nil then
 			if amount > 0 then
 				UsersInventories[identifier][name]:addCount(amount)
 				InventoryService.SaveInventoryItemsSupport()
 			end
 		else
-			if next(svItems[name]) ~= nil then
+			if svItems[name] ~= nil then
 				UsersInventories[identifier][name] = Item:New({
 					count = amount,
 					limit = svItems[name]:getLimit(),
@@ -162,7 +162,7 @@ InventoryService.addWeapon = function (target, weaponId)
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 	
-	if next(UsersWeapons[weaponId]) ~= nil then
+	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setPropietary(identifier)
 		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
 			['identifier'] = identifier, 
@@ -179,7 +179,7 @@ InventoryService.subWeapon = function (target, weaponId)
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 	
-	if next(UsersWeapons[weaponId]) ~= nil then	
+	if UsersWeapons[weaponId] ~= nil then	
 		UsersWeapons[weaponId]:setPropietary('')
 		
 		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
@@ -196,16 +196,16 @@ InventoryService.onPickup = function (obj)
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 
-	if next(ItemPickUps[obj]) ~= nil then
+	if ItemPickUps[obj] ~= nil then
 		local name = ItemPickUps[obj].name
 		local amount = ItemPickUps[obj].amount
 
 		if ItemPickUps[obj].weaponid == 1 then
 
-			if next(UsersInventories[identifier]) ~= nil then
+			if UsersInventories[identifier] ~= nil then
 				if svItems[name]:getLimit() ~= -1 then
 				
-					if next(UsersInventories[identifier][name]) ~= nil then
+					if UsersInventories[identifier][name] ~= nil then
 						local sourceItemCount = UsersInventories[identifier][name]:getCount()
 						local totalAmount = amount + sourceItemCount
 
@@ -230,7 +230,7 @@ InventoryService.onPickup = function (obj)
 
 				TriggerClientEvent("vorpInventory:sharePickUpClient", _source, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
 
-				TriggerClientEvent("vorpInventory:removePickupClient", _source, ItemPickUps[obj].obj) -- FIXME cache probleme mdr
+				TriggerClientEvent("vorpInventory:removePickupClient", _source, ItemPickUps[obj].obj)
 
 				TriggerClientEvent("vorpInventory:receiveItem", _source, name, amount)
 
@@ -263,7 +263,7 @@ end
 InventoryService.onPickupMoney = function (obj) 
 	local _source = source
 
-	if next(MoneyPickUps[obj]) ~= nil then
+	if MoneyPickUps[obj] ~= nil then
 		local moneyObj = MoneyPickUps[obj].obj
 		local moneyAmount = MoneyPickUps[obj].amount
 		local moneyCoords = MoneyPickUps[obj].coords
@@ -320,7 +320,7 @@ InventoryService.GiveWeapon = function (weaponId, target)
 	local _source = source
 	local _target = target
 
-	if next(UsersWeapons[weaponId]) ~= nil then
+	if UsersWeapons[weaponId] ~= nil then
 		InventoryService.subWeapon(_source, weaponId)
 		InventoryService.addWeapon(_target, weaponId)
 
@@ -340,7 +340,7 @@ InventoryService.GiveItem = function (itemName, amount, target)
 	local sourceIdentifier = GetPlayerIdentifiers(_source)[1]
 	local targetIdentifier = GetPlayerIdentifiers(_target)[1]
 
-	if next(UsersInventories[sourceIdentifier]) == nil or next(UsersInventories[targetIdentifier]) == nil or next(UsersInventories[sourceIdentifier][itemName]) == nil then
+	if UsersInventories[sourceIdentifier] == nil or UsersInventories[targetIdentifier] == nil or UsersInventories[sourceIdentifier][itemName] == nil then
 		TriggerClientEvent("vorp:TipRight", _source, _U('itemerror'), 2000)
 		return
 	end
@@ -375,7 +375,7 @@ end
 InventoryService.getItemsTable = function () 
 	local _source = source
 
-	if next(DB_Items) ~= nil then
+	if DB_Items ~= nil then
 		TriggerClientEvent("vorpInventory:giveItemsTable", _source, DB_Items)
 	end
 end
@@ -390,7 +390,7 @@ InventoryService.getInventory = function ()
 	local characterInventory = {}
 	local characterWeapons = {}
 
-	if next(sourceInventory) ~= nil then
+	if sourceInventory ~= nil then
 		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
 
 			if sourceInventory[item.item] ~= nil then
@@ -416,7 +416,7 @@ InventoryService.getInventory = function ()
 			['charid'] = sourceCharid,
 		}, 
 	function(result)
-		if next(result) ~= nil then	
+		if result ~= nil then	
 			for _, weapon in pairs(result) do
 				local db_Ammo = json.decode(weapon.ammo)
 				local weaponAmmo = {}
