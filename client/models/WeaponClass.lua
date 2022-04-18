@@ -5,6 +5,7 @@ Weapon.label = nil
 Weapon.id = nil
 Weapon.propietary = nil
 Weapon.ammo = {}
+Weapon.components = {}
 Weapon.used = false
 Weapon.used2 = false
 
@@ -105,6 +106,10 @@ end
 
 function Weapon:getLabel()
 	return self.label
+end
+
+function Weapon:loadComponents()
+	return self.components
 end
 
 function Weapon:New (t)

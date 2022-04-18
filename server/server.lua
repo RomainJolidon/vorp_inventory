@@ -123,15 +123,17 @@ function Discord(title,_source,description)
       }
     end
     PerformHttpRequest(Config.webhook, function(err, text, headers) end, 'POST', json.encode({["username"] = title ,["avatar_url"] = avatar ,embeds = logs}), { ['Content-Type'] = 'application/json' })
-  end
+end
 
-  RegisterCommand("getInv", function(source, args, rawCommand)
+
+
+  
+RegisterCommand("getInv", function(source, args, rawCommand)
     -- If the source is > 0, then that means it must be a player.
     if (source > 0) then
         local characterId = Core.getUser(source).getUsedCharacter
     
         TriggerClientEvent("vorp:SelectedCharacter", source, characterId)
-        TriggerEvent("vorp_NewCharacter", source)
     
     -- If it's not a player, then it must be RCON, a resource, or the server console directly.
     else

@@ -16,3 +16,16 @@ AddEventHandler('syn:getnuistuff', function(x,y,mon,gol)
         id          = GetPlayerServerId(NetworkGetEntityOwner(player))
     })
 end)
+
+AddEventHandler('onClientResourceStart', function (resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+      return
+    end
+    print('loading resource')
+    SetNuiFocus(false, false)
+	SendNUIMessage({action= "hide"})
+	print("Loading Inventory")
+	TriggerServerEvent("vorpinventory:getItemsTable")
+	Wait(300)
+	TriggerServerEvent("vorpinventory:getInventory")
+  end)
