@@ -249,9 +249,9 @@ InventoryService.onPickup = function (obj)
 					InventoryService.addWeapon(_source, weaponId)
 
 					TriggerEvent("syn_weapons:onpickup", weaponId)
-					TriggerClientEvent("vorpInventory:sharePickupClient", name, obj)
+					TriggerClientEvent("vorpInventory:sharePickupClient", _source, name, obj)
 					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
-					TriggerClientEvent("vorpInventory:playerAnim", obj)
+					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
 					ItemPickUps[obj] = nil
 				end
 			end
