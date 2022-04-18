@@ -33,7 +33,7 @@ InventoryService.DropAllMoney = function ()
 	if userMoney > 0 then
 		userCharacter.removeCurrency(0, userMoney)
 
-		TriggerClientEvent("vorp:createMoneyPickup", _source, sourceMoney)
+		TriggerClientEvent("vorp:createMoneyPickup", _source, userMoney)
 	end
 end
 
