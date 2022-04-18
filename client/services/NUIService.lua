@@ -4,7 +4,7 @@ isProcessingPay = false
 InInventory = false
 
 NUIService.ReloadInventory = function (inventory)
-	SendNUIMessage(inventory)
+	SendNUIMessage(json.decode(inventory))
 	Wait(500)
 	NUIService.LoadInv()
 end
