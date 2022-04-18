@@ -65,7 +65,7 @@ InventoryAPI.canCarryItem = function(player, itemName, amount, cb)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
-	if (svItems[itemName]) ~= nil then
+	if svItems[itemName] ~= nil then
 		local limit = svItems[itemName]:getLimit()
 
 		if limit ~= -1 then
@@ -168,7 +168,7 @@ InventoryAPI.useItem = function(source, itemName, args)
 	local identifier = sourceCharacter.identifier
 
 	if (UsableItemsFunctions[itemName]) ~= nil then
-		if (svItems[itemName]) ~= nil then
+		if svItems[itemName] ~= nil then
 			local arguments = {
 				source = _source,
 				item = svItems[itemName],
@@ -379,7 +379,7 @@ InventoryAPI.subItem = function(player, name, amount)
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
-	if (svItems[name]) == nil then
+	if svItems[name] == nil then
 		if Config.Debug then
 			Error.Warning("Item: [^2" .. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
 		end
@@ -421,11 +421,10 @@ InventoryAPI.registerWeapon = function(target, name, ammos, components)
 	local ammo = {}
 	local component = {}
 
-	if (targetUser) ~= nil then
+	if targetUser ~= nil then
 		targetCharacter = targetUser.getUsedCharacter
 		targetIdentifier = targetUser.getIdentifier()
 		targetCharId = targetCharacter.charIdentifier
-
 	end
 
 	if Config.MaxItemsInInventory.Weapons ~= 0 then
@@ -439,13 +438,13 @@ InventoryAPI.registerWeapon = function(target, name, ammos, components)
 		end
 	end
 
-	if (ammos) ~= nil then
+	if ammos ~= nil then
 		for _, value in pairs(ammos) do
 			ammo[_] = value:getCount()
 		end
 	end
 
-	if (components) ~= nil then
+	if components ~= nil then
 		for key, value in pairs(components) do
 			component[#component + 1] = key
 		end
@@ -471,7 +470,7 @@ InventoryAPI.registerWeapon = function(target, name, ammos, components)
 		UsersWeapons[weaponId] = newWeapon
 
 		TriggerEvent("syn_weapons:registerWeapon", weaponId) -- CHECK IF THE EVENT IS CLIENT SIDE
-		TriggerClientEvent("vorpinventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo)
+		TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo)
 	end)
 end
 

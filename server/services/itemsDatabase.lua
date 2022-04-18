@@ -13,8 +13,8 @@ local LoadDatabase = function ()
 					label = db_item.label,
 					limit = db_item.limit,
 					type = db_item.type,
-					canUse = db_item.canUse ,
-					canRemove = db_item.canRemove
+					canUse = db_item.usable,
+					canRemove = db_item.can_remove
 				})
 				svItems[item.item] = item
 				--DB_Items[item.item] = item

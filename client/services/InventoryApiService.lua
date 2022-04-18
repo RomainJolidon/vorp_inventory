@@ -11,6 +11,7 @@ InventoryApiService.addItem = function (count, limit, label, name, type, canUse,
     if UserInventory[name] ~= nil then
         UserInventory[name]:addCount(count)
     else
+        print('adding new item: ' .. label)
         UserInventory[name] = Item:New({
             count = count,
             limit = limit,

@@ -88,6 +88,7 @@ InventoryService.receiveWeapon = function (id, propietary, name, ammos)
 		UserWeapons[newWeapon:getId()] = newWeapon
 		NUIService.LoadInv()
 	end
+
 end
 
 InventoryService.onSelectedCharacter = function (charId)

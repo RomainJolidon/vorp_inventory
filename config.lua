@@ -24,14 +24,14 @@ Config  = {
     gaveitem = "item transfer",
     gave = " transfered ",
     to = " to ",
-    withid = "      with the weapon ID: ",
+    withid = " with the weapon ID: ",
   },
 
   -- NEED TO TEST
   DropOnRespawn  = {
-    Money   = false,
-    Weapons = false,
-    Items  = false
+    Money   = true,
+    Weapons = true,
+    Items  = true
   },
 
   -- HOW MANY WEAPONS AND ITEMS ALLOWED PER PLAYER
