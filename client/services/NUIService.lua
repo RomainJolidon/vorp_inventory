@@ -39,9 +39,9 @@ NUIService.CloseInventory = function ()
 	InInventory = false
 end
 
-NUIService.OpenHorseInventory = function (horseName, horseId)
+NUIService.OpenHorseInventory = function (horseTitle, horseId)
 	SetNuiFocus(true, true)
-	SendNuiMessage({action= "display", type= "horse", title= horseName, horseid= horseId})
+	SendNUIMessage({action= "display", type= "horse", title= horseTitle, horseid= horseId})
 	InInventory = true
 	TriggerEvent("vorp_stables:setClosedInv", true)
 end
@@ -56,7 +56,7 @@ end
 
 NUIService.OpenstealInventory = function (stealName, stealId)
 	SetNuiFocus(false, false)
-	SendNuiMessage({action= "display", type=  "steal", title= stealName, stealId= stealId})
+	SendNUIMessage({action= "display", type=  "steal", title= stealName, stealId= stealId})
 	InInventory = true
 	TriggerEvent("vorp_stables:setClosedInv", true)
 end
@@ -102,7 +102,7 @@ end
 
 NUIService.OpenHideoutInventory = function (hideoutName, hideoutId)
 	SetNuiFocus(true, true)
-	SendNuiMessage({action= "display", type= "hideout", title= hideoutName , hideoutId= hideoutId})
+	SendNUIMessage({action= "display", type= "hideout", title= hideoutName , hideoutId= hideoutId})
 	InInventory = true
 end
 

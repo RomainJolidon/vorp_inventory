@@ -37,7 +37,7 @@ function Weapon:setCharid(charId)
 	self.charId = charId
 end
 
-function Weapon:getCharid()
+function Weapon:getCharId()
 	return self.charId
 end
 
