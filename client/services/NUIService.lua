@@ -119,7 +119,7 @@ NUIService.setProcessingPayFalse = function ()
 end
 
 NUIService.NUIUnequipWeapon = function (obj)
-	local data = json.decode(obj)
+	local data = obj
 
 	if UserWeapons[tonumber(data.id)] ~= nil then
 		UserWeapons[tonumber(data.id)]:UnequipWeapon()

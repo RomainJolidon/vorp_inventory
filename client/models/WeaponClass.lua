@@ -11,11 +11,11 @@ Weapon.used2 = false
 
 function Weapon:UnequipWeapon()
 	local hash = GetHashKey(self.name)
-	self.setUsed(false)
-	self.setUsed2(false)
+	self:setUsed(false)
+	self:setUsed2(false)
 
-	TriggerServerEvent("vorpinventory:setUsedWeapon", self.id, self.getUsed(), self.getUsed2())
-	self.RemoveWeaponFromPed()
+	TriggerServerEvent("vorpinventory:setUsedWeapon", self.id, self:getUsed(), self:getUsed2())
+	self:RemoveWeaponFromPed()
 
 	Utils.cleanAmmo(self.id)
 end
@@ -25,7 +25,48 @@ function Weapon:RemoveWeaponFromPed()
 end
 
 function Weapon:loadAmmo()
-	-- Completar al final
+	local pattern = 'WEAPON_MELEE'
+	if self.name:sub(1, #pattern) == pattern then
+		Citizen.InvokeNative(0xB282DC6EBD803C75, PlayerPedId(), GetHashKey(self.name), 500, true, 0)
+	else
+		if self.used2 then
+			-- GETTING THE EQUIPED WEAPON
+			local _, weaponHash = GetCurrentPedWeapon(PlayerPedId(), false, 0, false)
+			Citizen.InvokeNative(0x5E3BDDBCB83F3D84, PlayerPedId(), weaponHash, 1, 1, 1, 2, false, 0.5, 1.0, 752097756, 0, true, 0.0)
+			Citizen.InvokeNative(0x5E3BDDBCB83F3D84, PlayerPedId(), GetHashKey(self.name), 1, 1, 1, 3, false, 0.5, 1.0, 752097756, 0, true, 0.0)
+			Citizen.InvokeNative(0xADF692B254977C0C, PlayerPedId(), weaponHash, 0, 1, 0, 0)
+			Citizen.InvokeNative(0xADF692B254977C0C, PlayerPedId(), GetHashKey(self.name), 0, 0, 0, 0)
+		else
+			GiveDelayedWeaponToPed(PlayerPedId(), GetHashKey(self.name), 0, true, 0)
+		end
+		SetPedAmmo(PlayerPedId(), GetHashKey(self.name), 0)
+		for key, value in pairs(self.ammo) do
+			SetPedAmmoByType(PlayerPedId(), GetHashKey(self.name), value)
+		end
+	end
+end
+
+function Weapon:loadComponents()
+	for _, value in pairs(self.components) do
+		Citizen.InvokeNative(0x74C9090FDD1BB48E, PlayerPedId(), GetHashKey(value), GetHashKey(self.name), true)
+	end
+end
+
+function Weapon:getAllComponents()
+	return self.components
+end
+
+function Weapon:setComponent(component)
+	table.insert(self.components, component)
+end
+
+function Weapon:quitComponent(component)
+	local componentExists = FindIndexOf(self.components, component)
+	if componentExists then
+		table.remove(self.component, componentExists)
+		return true
+	end
+	return false
 end
 
 function Weapon:getUsed()
@@ -108,13 +149,18 @@ function Weapon:getLabel()
 	return self.label
 end
 
-function Weapon:loadComponents()
-	return self.components
-end
-
 function Weapon:New (t)
 	t = t or {}
 	setmetatable(t, self)
 	self.__index = self
 	return t
+end
+
+function FindIndexOf(table, value)
+	for k,v in pairs(table) do
+		if v == value then
+			return k
+		end
+	end
+	return false
 end

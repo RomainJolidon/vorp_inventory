@@ -22,17 +22,17 @@ Utils.useWeapon = function (id)
 			print(GetHashKey(_) .. ": ".. _ .. " " .. ammo)
 		end
 	else
-		oldUseWeapon(id)
+		Utils.oldUseWeapon(id)
 	end
 end
 
 Utils.oldUseWeapon = function (id) 
-	local weaponHash = GetHashKey(userWeapons[id]:getName())
+	local weaponHash = GetHashKey(UserWeapons[id]:getName())
 	
 	GiveWeaponToPed_2(PlayerPedId(), weaponHash, 0, true, true, 2, false, 0.5, 1.0, 752097756, false, 0, false);
     SetCurrentPedWeapon(PlayerPedId(), weaponHash, 0, 1, 0, 0);
     SetPedAmmo(PlayerPedId(), weaponHash, 0);
-	for type, amount in UserWeapons[id]:getAllAmmo() do
+	for type, amount in pairs(UserWeapons[id]:getAllAmmo()) do
     	SetPedAmmoByType(PlayerPedId(), GetHashKey(type), amount);
         print(GetHashKey(type) .. ": ".. type .. " " .. amount);
 	end
@@ -108,6 +108,12 @@ Utils.GetWeaponLabel = function (hash)
 	end
 	return hash
 end
+
+function Utils.TableRemoveByKey(table, key)
+	local element = table[key]
+	table[key] = nil
+	return element
+ end
 
 
 Utils.Publicweapons = {

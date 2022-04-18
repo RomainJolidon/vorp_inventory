@@ -33,7 +33,7 @@ function Weapon:getPropietary()
 	return self.propietary
 end
 
-function Weapon:setCharid(charId)
+function Weapon:setCharId(charId)
 	self.charId = charId
 end
 

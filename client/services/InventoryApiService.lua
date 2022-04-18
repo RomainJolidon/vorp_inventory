@@ -31,7 +31,7 @@ InventoryApiService.subWeapon = function (weaponId)
         if UserWeapons[weaponId]:getUsed() then
             RemoveWeaponFromPed(PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()),true, 0)
         end
-        table.remove(UserWeapons, weaponId)
+        Utils.TableRemoveByKey(UserWeapons, weaponId)
     end
     NUIService.LoadInv()
 end
@@ -42,7 +42,8 @@ InventoryApiService.subItem = function (name, qty)
     if UserInventory[name] ~= nil then
         UserInventory[name]:setCount(qty)
         if UserInventory[name]:getCount() == 0 then
-            table.remove(UserInventory, name)
+            --table.remove(UserInventory, name)
+            Utils.TableRemoveByKey(UserInventory, name)
         end
     end
     NUIService.LoadInv()
