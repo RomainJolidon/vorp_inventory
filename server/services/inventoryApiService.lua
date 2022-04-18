@@ -1,8 +1,7 @@
-
 InventoryAPI = {}
 UsableItemsFunctions = {}
 
-InventoryAPI.SaveInventoryItemsSupport = function (player)
+InventoryAPI.SaveInventoryItemsSupport = function(player)
 	Wait(1000)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -21,14 +20,14 @@ InventoryAPI.SaveInventoryItemsSupport = function (player)
 				['inventory'] = json.encode(items),
 				['identifier'] = identifier,
 				['charid'] = charId
-			}, function () end)
+			}, function() end)
 		end
 	end
 end
 
-InventoryAPI.canCarryAmountWeapons = function (player, amount, cb)
+InventoryAPI.canCarryAmountWeapons = function(player, amount, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter 
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charidentifier
 	local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + amount
@@ -44,7 +43,7 @@ InventoryAPI.canCarryAmountWeapons = function (player, amount, cb)
 	end
 end
 
-InventoryAPI.canCarryAmountItem = function (player, amount, cb)
+InventoryAPI.canCarryAmountItem = function(player, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -61,7 +60,7 @@ InventoryAPI.canCarryAmountItem = function (player, amount, cb)
 	end
 end
 
-InventoryAPI.canCarryItem = function (player, itemName, amount, cb)
+InventoryAPI.canCarryItem = function(player, itemName, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -74,7 +73,7 @@ InventoryAPI.canCarryItem = function (player, itemName, amount, cb)
 				if (UsersInventories[identifier][itemName]) ~= nil then
 					local count = UsersInventories[identifier][itemName]:getCount()
 					local total = count + amount
-					
+
 					if total <= limit then
 						if Config.MaxItemsInInventory.Items ~= -1 then
 							local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
@@ -140,7 +139,7 @@ InventoryAPI.canCarryItem = function (player, itemName, amount, cb)
 	end
 end
 
-InventoryAPI.getInventory = function (player, cb)
+InventoryAPI.getInventory = function(player, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -163,32 +162,32 @@ InventoryAPI.getInventory = function (player, cb)
 	end
 end
 
-InventoryAPI.useItem = function (source, itemName, args)
+InventoryAPI.useItem = function(source, itemName, args)
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
 	if (UsableItemsFunctions[itemName]) ~= nil then
 		if (svItems[itemName]) ~= nil then
-			local argumentos = {
+			local arguments = {
 				source = _source,
 				item = svItems[itemName],
 				args = args
 			}
-			UsableItemsFunctions[itemname](argumentos);
+			UsableItemsFunctions[itemName](arguments);
 		end
 	end
 end
 
-InventoryAPI.registerUsableItem = function (name, cb)
+InventoryAPI.registerUsableItem = function(name, cb)
 	UsableItemsFunctions[name] = cb
-    if Config.Debug then
+	if Config.Debug then
 		Wait(9000) -- so it doesn't print everywhere in the console
-	 Error.print("These items[^3"..name.."^7] ^2Are Registered!^7")
+		Error.print("These items[^3" .. name .. "^7] ^2Are Registered!^7")
 	end
 end
 
-InventoryAPI.getUserWeapon = function (player, cb, weaponId)
+InventoryAPI.getUserWeapon = function(player, cb, weaponId)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -206,7 +205,7 @@ InventoryAPI.getUserWeapon = function (player, cb, weaponId)
 	cb(weapon)
 end
 
-InventoryAPI.getUserWeapons = function (player, cb)
+InventoryAPI.getUserWeapons = function(player, cb)
 	local _source = player
 	local sourceCharacter = getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -214,7 +213,7 @@ InventoryAPI.getUserWeapons = function (player, cb)
 	local charidentifier = sourceCharacter.charIdentifier
 
 	local userWeapons = {}
-	
+
 	for _, currentWeapon in pairs(UsersWeapons) do
 		if currentWeapon.getPropietary() == identifier and currentWeapon.getCharId() == charidentifier then
 			local weapon = {
@@ -230,7 +229,7 @@ InventoryAPI.getUserWeapons = function (player, cb)
 	cb(userWeapons)
 end
 
-InventoryAPI.getWeaponBullets = function (player, cb, weaponId)
+InventoryAPI.getWeaponBullets = function(player, cb, weaponId)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -242,7 +241,7 @@ InventoryAPI.getWeaponBullets = function (player, cb, weaponId)
 	end
 end
 
-InventoryAPI.addBullets = function (player, weaponId, bulletType, amount)
+InventoryAPI.addBullets = function(player, weaponId, bulletType, amount)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -255,7 +254,7 @@ InventoryAPI.addBullets = function (player, weaponId, bulletType, amount)
 	end
 end
 
-InventoryAPI.subBullets = function (weaponId, bulletType, amount)
+InventoryAPI.subBullets = function(weaponId, bulletType, amount)
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -268,7 +267,7 @@ InventoryAPI.subBullets = function (weaponId, bulletType, amount)
 	end
 end
 
-InventoryAPI.getItems = function (player, cb, item)
+InventoryAPI.getItems = function(player, cb, item)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -283,21 +282,21 @@ InventoryAPI.getItems = function (player, cb, item)
 	end
 end
 
-InventoryAPI.addItem = function (player, name, amount)
+InventoryAPI.addItem = function(player, name, amount)
 	local _source = player
 	local sourceUser = Core.getUser(_source)
 	local added = false
-	
+
 	if (sourceUser) == nil then
 		return
 	end
-	
+
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
-	
+
 	if svItems[name] == nil then
 		if Config.Debug then
-		   Error.Warning("Item: [^2".. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
+			Error.Warning("Item: [^2" .. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
 		end
 		return
 	end
@@ -316,8 +315,8 @@ InventoryAPI.addItem = function (player, name, amount)
 
 	local sourceItemLimit = svItems[name]:getLimit()
 	local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
-	
-	if UsersInventories[identifier][name] == nil then 
+
+	if UsersInventories[identifier][name] == nil then
 		if amount > sourceItemLimit and sourceInventoryItemCount > Config.MaxItemsInInventory.Items and Config.MaxItemsInInventory.Items ~= 0 and svItems[sourceItemLimit] ~= -1 then
 			return
 		else
@@ -329,28 +328,28 @@ InventoryAPI.addItem = function (player, name, amount)
 				count = amount,
 				limit = sourceItemLimit,
 				label = itemLabel,
-				name = name, 
-				type = itemType, 
+				name = name,
+				type = itemType,
 				usable = true,
 				canRemove = itemCanRemove
 			})
 			added = true
 		end
 	end
-	
+
 	local sourceItemCount = UsersInventories[identifier][name]:getCount()
 
 	if not added then
 		if sourceItemCount + amount > sourceItemLimit and sourceItemLimit ~= -1 then
 			return
 		end
-	
+
 		if Config.MaxItemsInInventory.Items ~= 0 then
 			if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
 				return
 			end
 		end
-		
+
 		UsersInventories[identifier][name]:addCount(amount)
 		added = true
 	end
@@ -369,26 +368,26 @@ InventoryAPI.addItem = function (player, name, amount)
 	end
 end
 
-InventoryAPI.subItem = function (player, name, amount)
+InventoryAPI.subItem = function(player, name, amount)
 	local _source = player
 	local sourceUser = Core.getUser(_source)
-	
+
 	if (sourceUser) == nil then
 		return
 	end
-	
+
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
 	if (svItems[name]) == nil then
 		if Config.Debug then
-			Error.Warning("Item: [^2".. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
+			Error.Warning("Item: [^2" .. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
 		end
 		return
 	end
 
 	if (UsersInventories[identifier]) ~= nil then
-		if (UsersInventories[identifier][name]) ~= nil then 
+		if (UsersInventories[identifier][name]) ~= nil then
 			local sourceItemCount = UsersInventories[identifier][name]:getCount()
 
 			if amount <= sourceItemCount then
@@ -396,8 +395,8 @@ InventoryAPI.subItem = function (player, name, amount)
 			else
 				return
 			end
-			
-			
+
+
 			if UsersInventories[identifier][name]:getCount() == 0 then
 				UsersInventories[identifier][name] = nil
 			end
@@ -408,25 +407,25 @@ InventoryAPI.subItem = function (player, name, amount)
 	end
 end
 
-InventoryAPI.registerWeapon = function (target, name, ammos, components)
+InventoryAPI.registerWeapon = function(target, name, ammos, components)
 	local _target = target
 
 	local targetUser = Core.getUser(_target)
-	
+
 	local targetCharacter
-	
+
 	local targetIdentifier
 
 	local targetCharId
-	
+
 	local ammo = {}
 	local component = {}
-	
+
 	if (targetUser) ~= nil then
 		targetCharacter = targetUser.getUsedCharacter
 		targetIdentifier = targetUser.getIdentifier()
 		targetCharId = targetCharacter.charIdentifier
-	
+
 	end
 
 	if Config.MaxItemsInInventory.Weapons ~= 0 then
@@ -434,7 +433,7 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 
 		if targetTotalWeaponCount > Config.MaxItemsInInventory.Weapons then
 			if Config.Debug then
-			    Error.Warning(targetCharacter.firstname .. " " .. targetCharacter.lastname .. " ^1Can't carry more weapons^7")
+				Error.Warning(targetCharacter.firstname .. " " .. targetCharacter.lastname .. " ^1Can't carry more weapons^7")
 			end
 			return
 		end
@@ -448,7 +447,7 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 
 	if (components) ~= nil then
 		for key, value in pairs(components) do
-			component[#component+1] = key
+			component[#component + 1] = key
 		end
 	end
 
@@ -458,11 +457,11 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 		['name'] = name,
 		['ammo'] = json.encode(ammo),
 		['components'] = json.encode(component)
-	}, function (result) 
+	}, function(result)
 		local weaponId = result.insertId
 		local newWeapon = Weapon:New({
 			id = weaponId,
-			propietary = targetIdentifier, 
+			propietary = targetIdentifier,
 			name = name,
 			ammo = ammo,
 			used = false,
@@ -470,36 +469,29 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 			charId = targetCharId
 		})
 		UsersWeapons[weaponId] = newWeapon
-		
+
 		TriggerEvent("syn_weapons:registerWeapon", weaponId) -- CHECK IF THE EVENT IS CLIENT SIDE
 		TriggerClientEvent("vorpinventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo)
 	end)
 end
 
-InventoryAPI.giveWeapon = function (player, weaponId, target)
+InventoryAPI.giveWeapon = function(player, weaponId, target)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
-	
 	local _target = target
-	local targetUser = Core.getUser(_target)
-	local targetCharacter
-	local targetIdentifier 
-	local targetCharId 
 
-	if (targetUser) ~= nil then
-		targetCharacter = targetUser.getUsedCharacter
-		targetIdentifier = targetCharacter.identifier
-		targetCharId = targetCharacter.charIdentifier
-	end
+
+
+
 
 	if Config.MaxItemsInInventory.Weapons ~= 0 then
 		local sourceTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId) + 1
 
 		if sourceTotalWeaponCount > Config.MaxItemsInInventory.Weapons then
 			if Config.Debug then
-			    Error.print(sourceCharacter.firstname .. " " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
+				Error.print(sourceCharacter.firstname .. " " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
 			end
 			return
 		end
@@ -517,14 +509,14 @@ InventoryAPI.giveWeapon = function (player, weaponId, target)
 			['identifier'] = sourceIdentifier,
 			['charid'] = sourceCharId,
 			['id'] = weaponId
-		}, function () end)
+		}, function() end)
 
 		TriggerClientEvent("vorpinventory:receiveWeapon", _source, weaponPropietary, weaponName, weaponAmmo)
 		TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
 	end
 end
 
-InventoryAPI.subWeapon = function (player, weaponId)
+InventoryAPI.subWeapon = function(player, weaponId)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -534,16 +526,16 @@ InventoryAPI.subWeapon = function (player, weaponId)
 		UsersWeapons[weaponId]:setPropietary('')
 
 		exports.ghmattimysql:execute("UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id", {
-				['identifier'] = identifier,
-				['charid'] = charId,
-				['id'] = weaponId
-		}, function () end)
+			['identifier'] = identifier,
+			['charid'] = charId,
+			['id'] = weaponId
+		}, function() end)
 	end
 
 	TriggerClientEvent("vorpCoreClient:subWeapon", _source, weaponId)
 end
 
-InventoryAPI.getUserTotalCount = function (identifier)
+InventoryAPI.getUserTotalCount = function(identifier)
 	local userTotalItemCount = 0
 	for _, item in pairs(UsersInventories[identifier]) do
 		userTotalItemCount = userTotalItemCount + item:getCount()
@@ -551,7 +543,7 @@ InventoryAPI.getUserTotalCount = function (identifier)
 	return userTotalItemCount
 end
 
-InventoryAPI.getUserTotalCountWeapons = function (identifier, charId)
+InventoryAPI.getUserTotalCountWeapons = function(identifier, charId)
 	local userTotalWeaponCount = 0
 	for _, weapon in pairs(UsersWeapons) do
 		if weapon:getPropietary() == identifier and weapon:getCharId() == charId then
@@ -561,23 +553,23 @@ InventoryAPI.getUserTotalCountWeapons = function (identifier, charId)
 	return userTotalWeaponCount
 end
 
-InventoryAPI.onNewCharacter = function (playerId)
+InventoryAPI.onNewCharacter = function(playerId)
 	Wait(5000)
 	local player = Core.getUser(playerId)
 
 	if player == nil then
 		if Config.Debug then
-		    Error.print("Player [^2" .. playerId .. "^7] ^1 was not found^7")
+			Error.print("Player [^2" .. playerId .. "^7] ^1 was not found^7")
 		end
 		return
 	end
 
-	local identifier = player.getIdentifier()
+	--local identifier = player.getIdentifier()
 
 	-- Attempt to add all starter items/weapons from the Config.lua
 	for key, value in pairs(Config.startItems) do
 
-		Error.print("print:"..key..""..value.."")
+		Error.print("print:" .. key .. "" .. value .. "")
 		TriggerEvent("vorpCore:addItem", playerId, tostring(key), tonumber(value))
 	end
 
