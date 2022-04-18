@@ -45,7 +45,8 @@ end
 
 InventoryAPI.canCarryAmountItem = function(player, amount, cb)
 	local _source = player
-	local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (UsersInventories[identifier]) ~= nil and Config.MaxItemsInInventory.Items ~= -1 then
 		local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
@@ -61,7 +62,8 @@ end
 
 InventoryAPI.canCarryItem = function(player, itemName, amount, cb)
 	local _source = player
-	local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (svItems[itemName]) ~= nil then
 		local limit = svItems[itemName]:getLimit()
@@ -162,7 +164,8 @@ end
 
 InventoryAPI.useItem = function(source, itemName, args)
 	local _source = source
-	--local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (UsableItemsFunctions[itemName]) ~= nil then
 		if (svItems[itemName]) ~= nil then
@@ -186,7 +189,8 @@ end
 
 InventoryAPI.getUserWeapon = function(player, cb, weaponId)
 	local _source = player
-	--local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 	local weapon = {}
 
 	if (UsersWeapons[weaponId]) ~= nil then
@@ -227,7 +231,8 @@ end
 
 InventoryAPI.getWeaponBullets = function(player, cb, weaponId)
 	local _source = player
-	local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (UsersWeapons[weaponId]) ~= nil then
 		if UsersWeapons[weaponId]:getPropietary() == identifier then
@@ -238,7 +243,8 @@ end
 
 InventoryAPI.addBullets = function(player, weaponId, bulletType, amount)
 	local _source = player
-	local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (UsersWeapons[weaponId]) ~= nil then
 		if UsersWeapons[weaponId]:getPropietary() == identifier then
@@ -250,7 +256,8 @@ end
 
 InventoryAPI.subBullets = function(weaponId, bulletType, amount)
 	local _source = source
-	local identifier = GetPlayerIdentifiers(_source)[1]
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
 
 	if (UsersWeapons[weaponId]) ~= nil then
 		if UsersWeapons[weaponId]:getPropietary() == identifier then

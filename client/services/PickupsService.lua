@@ -4,8 +4,6 @@ local PickPrompt = nil
 local WorldPickups = {}
 local WorldMoneyPickups = {}
 
-local active = false
-local active2 = false
 local dropAll = false
 local lastCoords = {}
 
@@ -82,6 +80,7 @@ PickupsService.sharePickupClient = function (name, obj, amount, position, value,
 			amount = amount,
 			weaponid = weaponId,
 			inRange = false,
+			active = false,
 			coords = position
 		}
 	else
@@ -96,6 +95,7 @@ PickupsService.shareMoneyPickupClient = function (obj, amount, position, value)
 			obj = obj,
 			amount = amount,
 			inRange = false,
+			active = false,
 			coords = position
 		}
 	else
@@ -135,7 +135,7 @@ PickupsService.playerAnim = function (obj)
 end
 
 PickupsService.DeadActions = function ()
-	lastCoords = Citizen.InvokeNative(0xA86D5F069399F44D, PlayerPedId(), true, true)
+	lastCoords = GetEntityCoords(PlayerPedId(), true, true)
 	dropAll = true
 
 	if Config.DropOnRespawn.Money then
@@ -148,17 +148,17 @@ end
 PickupsService.dropAllPlease = function ()
 	Wait(200)
 	if Config.DropOnRespawn.Items then
-		local items = userInventory
+		local items = UserInventory
 
 		for _, item in pairs(items) do
-			local itemName = item.getName()
-			local itemCount = item.getCount()
+			local itemName = item:getName()
+			local itemCount = item:getCount()
 
 			TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount, 1)
-			userInventory[itemName]:quitCount(itemCount)
+			UserInventory[itemName]:quitCount(itemCount)
 
-			if userInventory[itemName]:getCount() == 0 then
-				userInventory[itemName] = nil
+			if UserInventory[itemName]:getCount() == 0 then
+				UserInventory[itemName] = nil
 			end
 
 			Wait(200)
@@ -166,25 +166,30 @@ PickupsService.dropAllPlease = function ()
 	end
 
 	if Config.DropOnRespawn.Weapons then
-		local weapons = userWeapons
+		local weapons = UserWeapons
 
 		for index, weapon in pairs(weapons) do
 			TriggerServerEvent("vorpinventory:serverDropWeapon", index)
 
-			if next(userWeapons[index]) ~= nil then
-				local currentWeapon = userWeapons[index]
+			if next(UserWeapons[index]) ~= nil then
+				local currentWeapon = UserWeapons[index]
 
-				if currentWeapon.getUsed() then
-					currentWeapon.setUsed(false)
-					RemoveWeaponFromPed(PlayerPedId(), GetHashKey(currentWeapon.getName()), true, 0)
+				if currentWeapon:getUsed() then
+					currentWeapon:setUsed(false)
+					RemoveWeaponFromPed(PlayerPedId(), GetHashKey(currentWeapon:getName()), true, 0)
 				end
 
-				userWeapons[index] = nil
+				UserWeapons[index] = nil
 			end
-			Wait(200)
-			dropAll = false
 		end
 	end
+
+	if Config.DropOnRespawn.Money then
+		TriggerServerEvent("vorpinventory:serverDropAllMoney")
+	end
+
+	Wait(200)
+	dropAll = false
 end
 
 PickupsService.principalFunctionsPickups = function ()
@@ -215,12 +220,12 @@ PickupsService.principalFunctionsPickups = function ()
 		if distance <= 1.2 and not pickup.inRange then
 			TaskLookAtEntity(playerPed, pickup.obj, 3000, 2048, 3)
 
-			if not active then
+			if not pickup.active then
 				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, true)
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, true)
-				active = true
+				pickup.active = true
 			end
-			
+
 			if Citizen.InvokeNative(0xE0F65F0640EF0617, PickPrompt) then
 				TriggerServerEvent("vorpinventory:onPickup", pickup.obj)
 				pickup.inRange = true
@@ -228,10 +233,10 @@ PickupsService.principalFunctionsPickups = function ()
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
 			end
 		else
-			if active then
+			if pickup.active then
 				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-				active = false
+				pickup.active = false
 			end
 		end
 	end
@@ -256,10 +261,10 @@ PickupsService.principalFunctionsPickupsMoney = function () -- Tick
 		if distance <= 1.2 and not pickup.inRange then
 			Citizen.InvokeNative(0x69F4BE8C8CC4796C, playerPed, pickup.obj, 3000, 2048, 3)
 
-			if not active2 then
+			if not pickup.active then
 				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, true)
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, true)
-				active2 = true
+				pickup.active = true
 			end
 
 			if Citizen.InvokeNative(0xE0F65F0640EF0617, PickPrompt) then
@@ -269,10 +274,10 @@ PickupsService.principalFunctionsPickupsMoney = function () -- Tick
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
 			end
 		else
-			if active2 then
+			if pickup.active then
 				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
 				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-				active2 = false
+				pickup.active = false
 			end
 		end
 	end
