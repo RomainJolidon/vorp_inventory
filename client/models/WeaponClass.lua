@@ -1,6 +1,7 @@
 Weapon = {}
 
 Weapon.name = nil
+Weapon.label = nil
 Weapon.id = nil
 Weapon.propietary = nil
 Weapon.ammo = {}
@@ -100,4 +101,15 @@ function Weapon:subAmmo(type, amount)
 			self.ammo[type] = nil
 		end
 	end
+end
+
+function Weapon:getLabel()
+	return self.label
+end
+
+function Weapon:New (t)
+	t = t or {}
+	setmetatable(t, self)
+	self.__index = self
+	return t
 end

@@ -435,13 +435,13 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 
 	if (ammos) ~= nil then
 		for _, value in pairs(ammos) do
-			ammo[_] = value
+			ammo[_] = value:getCount()
 		end
 	end
 
 	if (components) ~= nil then
-		for _, value in pairs(components) do
-			component[_] = value
+		for key, value in pairs(components) do
+			component[#component+1] = key
 		end
 	end
 
@@ -465,7 +465,7 @@ InventoryAPI.registerWeapon = function (target, name, ammos, components)
 		UsersWeapons[weaponId] = newWeapon
 		
 		TriggerEvent("syn_weapons:registerWeapon", weaponId) -- CHECK IF THE EVENT IS CLIENT SIDE
-		TriggerClientEvent("vorpinventory:receiveWeapon", _target, targetIdentifier, name, ammo)
+		TriggerClientEvent("vorpinventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo)
 	end)
 end
 

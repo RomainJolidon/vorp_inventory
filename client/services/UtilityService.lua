@@ -100,6 +100,15 @@ Utils.getNearestPlayers = function ()
 	return closestPlayers
 end
 
+Utils.GetWeaponLabel = function (hash)
+	for _, wp in pairs(Config.Weapons) do
+		if wp.HashName == hash then
+		  return wp.Name
+		end
+	end
+	return hash
+end
+
 
 Utils.Publicweapons = {
 	{0xC3662B7D,"WEAPON_KIT_CAMERA"},

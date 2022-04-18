@@ -20,8 +20,8 @@ InventoryService.updateAmmoInWeapon = function ()
 		local currentWeapon = nil
 
 		for _, weapon in pairs(UserWeapons) do
-			if string.find(weaponName, weapon.getName()) and weapon.getUsed() then
-				weaponAmmo = weapon.getAllAmmo()
+			if string.find(weaponName, weapon:getName()) and weapon:getUsed() then
+				weaponAmmo = weapon:getAllAmmo()
 				currentWeapon = weapon
 			end
 		end
@@ -32,7 +32,7 @@ InventoryService.updateAmmoInWeapon = function ()
 			local ammoAmount = Citizen.InvokeNative(0x39D22031557946C1, playerPed, GetHashKey(type))
 
 			if ammoAmount ~= amount then
-				currentWeapon.setAmmo(type, ammoAmount)
+				currentWeapon:setAmmo(type, ammoAmount)
 			end
 		end
 	end
@@ -74,20 +74,20 @@ InventoryService.receiveWeapon = function (id, propietary, name, ammos)
 		weaponAmmo[type] = tonumber(amount)
 	end
 
-	local newWeapon = Weapon:New({
-		id = id,
-		propietary = propietary,
-		name = name,
-		ammo = weaponAmmo,
-		used = false,
-		used2 = false
-	})
+	if UserWeapons[id] == nil then
+		local newWeapon = Weapon:New({
+			id = id,
+			propietary = propietary,
+			name = name,
+			label = Utils.GetWeaponLabel(name),
+			ammo = weaponAmmo,
+			used = false,
+			used2 = false
+		})
 
-	if UserWeapons[newWeapon.getId()] == nil then
-		UserWeapons[newWeapon.getId()] = newWeapon
+		UserWeapons[newWeapon:getId()] = newWeapon
+		NUIService.LoadInv()
 	end
-
-	NUIService.LoadInv()
 end
 
 InventoryService.onSelectedCharacter = function (charId)
@@ -128,18 +128,19 @@ InventoryService.getLoadout = function (loadout)
 		if weapon.used2 == 1 then weaponUsed2 = true end
 
 		local newWeapon = Weapon:New({
-			id = tonumner(weapon.id),
+			id = tonumber(weapon.id),
 			identifier = weapon.identifier,
+			label = Utils.GetWeaponLabel(weapon.name),
 			name = weapon.name,
 			ammo = weaponAmmo,
 			used = weaponUsed,
 			used2 = weaponUsed2
 		})
 
-		UserWeapons[newWeapon.getId()] = newWeapon
+		UserWeapons[newWeapon:getId()] = newWeapon
 
-		if newWeapon.getUsed() then
-			Utils.useWeapon(newWeapon.getId())
+		if newWeapon:getUsed() then
+			Utils.useWeapon(newWeapon:getId())
 		end
 	end
 end

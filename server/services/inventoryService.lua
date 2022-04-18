@@ -243,15 +243,14 @@ InventoryService.onPickup = function (obj)
 				local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId)
 				sourceInventoryWeaponCount = sourceInventoryWeaponCount + 1
 
-				if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.Weapon then
-					local weaponId = ItemPickUps[obj].weaponId
+				if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.Weapons then
+					local weaponId = ItemPickUps[obj].weaponid
 					local weaponObj = ItemPickUps[obj].obj
-					InventoryService.addWeapon(weaponId)
+					InventoryService.addWeapon(_source, weaponId)
 
 					TriggerEvent("syn_weapons:onpickup", weaponId)
 					TriggerClientEvent("vorpInventory:sharePickupClient", name, obj)
-					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, 
-					UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
+					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
 					TriggerClientEvent("vorpInventory:playerAnim", obj)
 					ItemPickUps[obj] = nil
 				end
@@ -306,7 +305,7 @@ end
 
 InventoryService.DropWeapon = function (weaponId) 
 	local _source = source
-	InventoryService.subWeapon(weaponId)
+	InventoryService.subWeapon(_source, weaponId)
 	TriggerClientEvent("vorpInventory:createPickup", _source, UsersWeapons[weaponId]:getName(), 1, weaponId)
 end
 
@@ -384,7 +383,7 @@ InventoryService.getInventory = function ()
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
-	local sourceCharid = sourceCharacter.charidentifier
+	local sourceCharId = sourceCharacter.charIdentifier
 	local sourceInventory = json.decode(sourceCharacter.inventory)
 
 	local characterInventory = {}
@@ -413,10 +412,10 @@ InventoryService.getInventory = function ()
 
 	exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', { 
 			['identifier'] = sourceIdentifier,
-			['charid'] = sourceCharid,
+			['charid'] = sourceCharId,
 		}, 
 	function(result)
-		if result ~= nil then	
+		if result ~= nil then
 			for _, weapon in pairs(result) do
 				local db_Ammo = json.decode(weapon.ammo)
 				local weaponAmmo = {}
@@ -424,7 +423,7 @@ InventoryService.getInventory = function ()
 				local used2 = false
 
 				for _, ammo in pairs(db_Ammo) do
-					weaponAmmo[ammo.Name] = ammo
+					weaponAmmo[_] = ammo
 				end
 
 				if weapon.used == 1 then used = true end
@@ -437,9 +436,9 @@ InventoryService.getInventory = function ()
 					ammo = weaponAmmo,
 					used = used,
 					used2 = used2,
-					charId = sourceCharid,
+					charId = sourceCharId,
 				})
-				UsersWeapons[newWeapon.getId()] = newWeapon
+				UsersWeapons[newWeapon:getId()] = newWeapon
 			end
 			TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 		end

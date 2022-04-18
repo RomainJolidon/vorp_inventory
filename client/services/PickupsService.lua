@@ -207,7 +207,7 @@ PickupsService.principalFunctionsPickups = function ()
 				end
 				Utils.DrawText3D(pickup.coords, name)
 			else
-				local name = GetWeaponName(GetHashKey(pickup.name))
+				local name = Utils.GetWeaponLabel(pickup.name)
 				Utils.DrawText3D(pickup.coords, name)
 			end
 		end

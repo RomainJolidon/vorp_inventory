@@ -121,7 +121,7 @@ end
 NUIService.NUIUnequipWeapon = function (obj)
 	local data = json.decode(obj)
 
-	if next(UserWeapons[tonumber(data.id)]) ~= nil then
+	if UserWeapons[tonumber(data.id)] ~= nil then
 		UserWeapons[tonumber(data.id)]:UnequipWeapon()
 	end
 
@@ -238,15 +238,15 @@ NUIService.NUIDropItem = function (obj)
 		end
 	end
 
-	if type ~= "item_money" and type ~= "item_standard" then
+	if type == "item_weapon" then
 		TriggerServerEvent("vorpinventory:serverDropWeapon", aux.id)
 
-		if next(UserWeapons[aux.id]) ~= nil then
+		if UserWeapons[aux.id] ~= nil then
 			local weapon = UserWeapons[aux.id]	
 
-			if weapon.getUsed() then
-				weapon.setUsed(false)
-				RemoveWeaponFromPed(PlayerPedId(), GetHashKey(weapon.getName()), true, 0)
+			if weapon:getUsed() then
+				weapon:setUsed(false)
+				RemoveWeaponFromPed(PlayerPedId(), GetHashKey(weapon:getName()), true, 0)
 			end
 
 			UserWeapons[aux.id] = nil
@@ -260,7 +260,31 @@ NUIService.NUIUseItem = function (data)
 	if data["type"] == "item_standard" then
 		TriggerServerEvent("vorp_inventory:useItem", data["item"])
 	elseif data["type"] == "item_weapon" then
-		-- Weapon stuff, todo later
+		local _, weaponHash = GetCurrentPedWeapon(PlayerPedId(), false, 0, false)
+        local weaponId = tonumber(data["id"])
+        local isWeaponARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, GetHashKey(UserWeapons[weaponId]:getName()))
+        local isWeaponAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, GetHashKey(UserWeapons[weaponId]:getName()))
+        local weaponName = Citizen.InvokeNative(0x89CF5FF3D363311E, weaponHash)
+
+        -- Check if the weapon used is a pistol or a revolver and ped is not unarmed.
+        if (isWeaponARevolver or isWeaponAPistol) and weaponName ~= "UNARMED" then
+            local isWeaponUsedARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, weaponHash)
+            local isWeaponUsedAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, weaponHash)
+
+            if isWeaponUsedAPistol or isWeaponUsedARevolver then
+                UserWeapons[weaponId]:setUsed2(true)
+                UserWeapons[weaponId]:loadAmmo()
+                UserWeapons[weaponId]:loadComponents()
+                UserWeapons[weaponId]:setUsed(true)
+                TriggerServerEvent("syn_weapons:weaponused", data)
+            end
+        elseif not UserWeapons[weaponId]:getUsed() and not Citizen.InvokeNative(0x8DECB02F88F428BC, PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()), 0, true) then
+                UserWeapons[weaponId]:loadAmmo()
+                UserWeapons[weaponId]:loadComponents()
+                UserWeapons[weaponId]:setUsed(true)
+                TriggerServerEvent("syn_weapons:weaponused", data)
+        end
+        NUIService.LoadInv()
 	end
 end
 
@@ -309,9 +333,9 @@ NUIService.LoadInv = function ()
 
 	for _, currentWeapon in  pairs(UserWeapons) do
 		local weapon = {}
-		weapon.count = currentWeapon.getAllAmo()
+		weapon.count = currentWeapon:getAllAmmo()
 		weapon.limit = -1
-		weapon.label = Citizen.InvokeNative(0x89CF5FF3D363311E, GetHashKey(currentWeapon.getName()))
+		weapon.label = currentWeapon:getLabel() -- Citizen.InvokeNative(0x89CF5FF3D363311E, GetHashKey(currentWeapon:getName()))
 		weapon.name = currentWeapon:getName()
 		weapon.hash = GetHashKey(currentWeapon:getName()) 
 		weapon.type = "item_weapon"

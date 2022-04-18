@@ -16,8 +16,8 @@ AddEventHandler("vorpInventory:receiveItem", InventoryService.receiveItem)
 RegisterNetEvent("vorpInventory:receiveItem2")
 AddEventHandler("vorpInventory:receiveItem2", InventoryService.receiveItem2)
 
-RegisterNetEvent("vorpinventory:receiveWeapon")
-AddEventHandler("vorpinventory:receiveWeapon", InventoryService.receiveWeapon)
+RegisterNetEvent("vorpInventory:receiveWeapon")
+AddEventHandler("vorpInventory:receiveWeapon", InventoryService.receiveWeapon)
 
 Citizen.CreateThread(InventoryService.updateAmmoInWeapon)
 	
