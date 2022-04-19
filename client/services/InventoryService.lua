@@ -68,7 +68,7 @@ InventoryService.receiveitem2 = function (name, count)
 end
 
 InventoryService.receiveWeapon = function (id, propietary, name, ammos)
-	local weaponAmmo = nil
+	local weaponAmmo = {}
 
 	for type, amount in pairs(ammos) do
 		weaponAmmo[type] = tonumber(amount)

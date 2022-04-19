@@ -162,19 +162,16 @@ InventoryAPI.getInventory = function(player, cb)
 	end
 end
 
-InventoryAPI.useItem = function(source, itemName, args)
+InventoryAPI.useItem = function(itemName, args)
 	local _source = source
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local identifier = sourceCharacter.identifier
-
-	if (UsableItemsFunctions[itemName]) ~= nil then
+	if UsableItemsFunctions[itemName] ~= nil then
 		if svItems[itemName] ~= nil then
 			local arguments = {
 				source = _source,
 				item = svItems[itemName],
 				args = args
 			}
-			UsableItemsFunctions[itemName](arguments);
+			UsableItemsFunctions[itemName](arguments)
 		end
 	end
 end
@@ -440,7 +437,7 @@ InventoryAPI.registerWeapon = function(target, name, ammos, components)
 
 	if ammos ~= nil then
 		for _, value in pairs(ammos) do
-			ammo[_] = value:getCount()
+			ammo[_] = value
 		end
 	end
 
@@ -480,10 +477,6 @@ InventoryAPI.giveWeapon = function(player, weaponId, target)
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
 	local _target = target
-
-
-
-
 
 	if Config.MaxItemsInInventory.Weapons ~= 0 then
 		local sourceTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId) + 1

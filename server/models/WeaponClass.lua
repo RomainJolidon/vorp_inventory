@@ -88,12 +88,12 @@ function Weapon:addAmmo(type, amount)
 	else
 		self.ammo[type] = amount
 	end
-	exports.ghmattimysql.execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self.getAllAmmo()), ['id'] = self.id}, function(result) end)
+	exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self:getAllAmmo()), ['id'] = self.id}, function(result) end)
 end
 
 function Weapon:setAmmo(type, amount)
 	self.ammo[type] = amount
-	exports.ghmattimysql.execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self.getAllAmmo()), ['id'] = self.id}, function(result) end)
+	exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self:getAllAmmo()), ['id'] = self.id}, function(result) end)
 end
 
 function Weapon:subAmmo(type, amount)
@@ -103,7 +103,7 @@ function Weapon:subAmmo(type, amount)
 		if self.ammo[type] <= 0 then
 			self.ammo[type] = nil
 		end
-		exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self.getAllAmmo()), ['id'] = self.id}, function(result) end)
+		exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self:getAllAmmo()), ['id'] = self.id}, function(result) end)
 	end
 end
 

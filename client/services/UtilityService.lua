@@ -85,7 +85,7 @@ Utils.getNearestPlayers = function ()
 	local closestPlayers = {}
 	local players = {}
 
-	for _, player in GetActivePlayers() do
+	for _, player in pairs(GetActivePlayers()) do
 		local target = GetPlayerPed(player)
 
 		if target ~= playerPed then

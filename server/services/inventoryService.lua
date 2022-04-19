@@ -228,9 +228,9 @@ InventoryService.onPickup = function (obj)
 
 				InventoryService.addItem(_source, name, amount)
 
-				TriggerClientEvent("vorpInventory:sharePickUpClient", _source, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
+				TriggerClientEvent("vorpInventory:sharePickUpClient", -1, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2, ItemPickUps[obj].weaponId)
 
-				TriggerClientEvent("vorpInventory:removePickupClient", _source, ItemPickUps[obj].obj)
+				TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
 
 				TriggerClientEvent("vorpInventory:receiveItem", _source, name, amount)
 
@@ -249,8 +249,8 @@ InventoryService.onPickup = function (obj)
 					InventoryService.addWeapon(_source, weaponId)
 
 					TriggerEvent("syn_weapons:onpickup", weaponId)
-					TriggerClientEvent("vorpInventory:sharePickUpClient", _source, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
-					TriggerClientEvent("vorpInventory:removePickupClient", _source, weaponObj)
+					TriggerClientEvent("vorpInventory:sharePickUpClient", -1, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
+					TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
 					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
 					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
 					ItemPickUps[obj] = nil
@@ -268,8 +268,8 @@ InventoryService.onPickupMoney = function (obj)
 		local moneyAmount = MoneyPickUps[obj].amount
 		local moneyCoords = MoneyPickUps[obj].coords
 
-		TriggerClientEvent("vorpInventory:shareMoneyPickupClient", _source, moneyObj, moneyAmount, moneyCoords, 2)
-		TriggerClientEvent("vorpInventory:removePickupClient", _source, moneyObj)
+		TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, moneyObj, moneyAmount, moneyCoords, 2)
+		TriggerClientEvent("vorpInventory:removePickupClient", -1, moneyObj)
 		TriggerClientEvent("vorpInventory:playerAnim", _source, moneyObj)
 		TriggerEvent("vorp:addMoney", _source, 0, moneyAmount)
 
@@ -279,7 +279,7 @@ end
 
 InventoryService.sharePickupServer = function (name, obj, amount, position, weaponId) 
 	local _source = source
-	TriggerClientEvent("vorpInventory:sharePickupClient", _source, name, obj, amount, position, 1, weaponId)
+	TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, obj, amount, position, 1, weaponId)
 
 	ItemPickUps[obj] = {
 		name = name,
@@ -293,7 +293,7 @@ end
 
 InventoryService.shareMoneyPickupServer = function (obj, amount, position) 
 	local _source = source
-	TriggerClientEvent("vorpInventory:shareMoneyPickupClient", _source, obj, amount, position, 1)
+	TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, obj, amount, position, 1)
 	MoneyPickUps[obj] = {
 		name = "Dollars",
 		obj = obj,
@@ -397,7 +397,6 @@ InventoryService.getInventory = function ()
 
 	if sourceInventory ~= nil then
 		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
-
 			if sourceInventory[item.item] ~= nil then
 				local newItem = Item:New({
 					count = tonumber(sourceInventory[item.item]),

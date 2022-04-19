@@ -1,5 +1,4 @@
 NUIService = {}
-gg = {} -- ??
 isProcessingPay = false
 InInventory = false
 
@@ -264,10 +263,11 @@ NUIService.NUIUseItem = function (data)
         local weaponId = tonumber(data["id"])
         local isWeaponARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, GetHashKey(UserWeapons[weaponId]:getName()))
         local isWeaponAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, GetHashKey(UserWeapons[weaponId]:getName()))
-        local weaponName = Citizen.InvokeNative(0x89CF5FF3D363311E, weaponHash)
-
+        -- local weaponName = Citizen.InvokeNative(0x6D3AC61694A791C5, weaponHash)
+		local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId(), 1)
+		
         -- Check if the weapon used is a pistol or a revolver and ped is not unarmed.
-        if (isWeaponARevolver or isWeaponAPistol) and weaponName ~= "UNARMED" then
+        if (isWeaponARevolver or isWeaponAPistol) and isArmed then
             local isWeaponUsedARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, weaponHash)
             local isWeaponUsedAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, weaponHash)
 
@@ -311,9 +311,8 @@ NUIService.OnKey = function ()
 end
 
 NUIService.LoadInv = function ()
-	local weapon = {}
+	local payload = {}
 	local items = {}
-	gg = {}
 	
 	TriggerServerEvent("vorpinventory:check_slots")
 	
@@ -328,12 +327,12 @@ NUIService.LoadInv = function ()
 		item.usable = currentItem:getUsable()
 		item.canRemove = currentItem:getCanRemove()
 
-		table.insert(gg, item)
+		table.insert(items, item)
 	end
 
 	for _, currentWeapon in  pairs(UserWeapons) do
 		local weapon = {}
-		weapon.count = currentWeapon:getAllAmmo()
+		weapon.count = 0 -- TODO Replace by number of ammo (all types or one specific tipe ?)
 		weapon.limit = -1
 		weapon.label = currentWeapon:getLabel() -- Citizen.InvokeNative(0x89CF5FF3D363311E, GetHashKey(currentWeapon:getName()))
 		weapon.name = currentWeapon:getName()
@@ -344,13 +343,13 @@ NUIService.LoadInv = function ()
 		weapon.id = currentWeapon:getId()
 		weapon.used = currentWeapon:getUsed()
 
-		table.insert(gg, weapon)
+		table.insert(items, weapon)
 	end
 
-	items.action = "setItems"
-	items.itemList = gg
+	payload.action = "setItems"
+	payload.itemList = items
 
-	SendNUIMessage(items)
+	SendNUIMessage(payload)
 end
 
 NUIService.OpenInv = function ()
