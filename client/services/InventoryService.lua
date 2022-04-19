@@ -74,6 +74,7 @@ InventoryService.receiveWeapon = function (id, propietary, name, ammos)
 		weaponAmmo[type] = tonumber(amount)
 	end
 
+
 	if UserWeapons[id] == nil then
 		local newWeapon = Weapon:New({
 			id = id,

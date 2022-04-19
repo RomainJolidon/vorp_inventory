@@ -81,18 +81,21 @@ end
 Utils.getNearestPlayers = function () 
 	local closestDistance = 5.0
 	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed)
+	local coords = GetEntityCoords(playerPed, true, true)
 	local closestPlayers = {}
-	local players = {}
+
+	print(json.encode(GetActivePlayers()))
+
 
 	for _, player in pairs(GetActivePlayers()) do
 		local target = GetPlayerPed(player)
 
 		if target ~= playerPed then
-			local targetCoords = GetEntityCoords(target)
-			local distance = #(targetCoords - coords)
+			local targetCoords = GetEntityCoords(target, true, true)
+			--local distance = #(targetCoords - coords)
+			local distance = GetDistanceBetweenCoords(targetCoords.x, targetCoords.y, targetCoords.z, coords.x, coords.y, coords.z, true)
 
-			if closestDistance > distance then
+			if distance < closestDistance then
 				table.insert(closestPlayers, player)
 			end
 		end

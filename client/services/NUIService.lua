@@ -194,19 +194,16 @@ NUIService.NUIGiveItem = function (obj)
 				if data2.type == "item_money" then
 					if isProcessingPay then return end
 					isProcessingPay = true
-					TriggerServerEvent("vorp_inventory:giveMoneyToPlayer", target, data2.count)
-				end
-
-				if data2.type ~= "item_money" and data2.id == 0 then
+					TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, data2.count)
+				elseif tonumber(data2.id) == 0 then
 					local amount = tonumber(data2.count)
 
 					if amount > 0 and UserInventory[itemName]:getCount() >= amount then
 						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, 1)
 					end
-				end
-
-				if data2.type ~= "item_money" and data2.id ~= 0 then
+				else
 					TriggerServerEvent("vorpinventory:serverGiveWeapon2", tonumber(data2.id), target)
+					TriggerServerEvent("vorpinventory:weaponlog", target, data2)
 				end
 
 				NUIService.LoadInv()

@@ -110,7 +110,7 @@ PickupsService.removePickupClient = function (obj)
 	while not NetworkHasControlOfEntity(obj) and timeout < 5000 do
 		timeout = timeout + 100
 		if timeout == 5000 then
-			print("No se ha obtenido el control de la entidad")
+			print("Failed to get Control of the Entity")
 		end
 		Wait(100)
 	end

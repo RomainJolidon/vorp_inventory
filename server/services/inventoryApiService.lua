@@ -477,6 +477,14 @@ InventoryAPI.giveWeapon = function(player, weaponId, target)
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
 	local _target = target
+	local targetisPlayer = false
+
+	for _, pl in pairs(GetPlayers()) do
+		if pl == _target then
+			targetisPlayer = true
+			break
+		end
+	end
 
 	if Config.MaxItemsInInventory.Weapons ~= 0 then
 		local sourceTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId) + 1
@@ -489,7 +497,7 @@ InventoryAPI.giveWeapon = function(player, weaponId, target)
 		end
 	end
 
-	if (UsersWeapons[weaponId]) ~= nil then
+	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setPropietary(sourceIdentifier)
 		UsersWeapons[weaponId]:setCharId(sourceCharId)
 
@@ -497,14 +505,17 @@ InventoryAPI.giveWeapon = function(player, weaponId, target)
 		local weaponName = UsersWeapons[weaponId]:getName()
 		local weaponAmmo = UsersWeapons[weaponId]:getAllAmmo()
 
-		exports.ghmattimysql:execute("UPDATE loadout SET identifier = @identifier AND charidentifier = @charid WHERE id = @id", {
+		exports.ghmattimysql:execute("UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id", {
 			['identifier'] = sourceIdentifier,
 			['charid'] = sourceCharId,
 			['id'] = weaponId
 		}, function() end)
 
-		TriggerClientEvent("vorpinventory:receiveWeapon", _source, weaponPropietary, weaponName, weaponAmmo)
-		TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
+		if targetisPlayer then
+			TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
+		end
+
+		TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, weaponPropietary, weaponName, weaponAmmo)
 	end
 end
 
