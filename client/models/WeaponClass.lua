@@ -123,7 +123,7 @@ function Weapon:getAmmo(type)
 end
 
 function Weapon:setAmmo(type, amount)
-	self.ammo[type] = amount
+	self.ammo[type] = tonumber(amount)
 	TriggerServerEvent("vorpinventory:setWeaponBullets", self.id, type, amount)
 end
 

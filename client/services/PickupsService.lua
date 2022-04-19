@@ -49,8 +49,8 @@ PickupsService.createMoneyPickup = function (amount)
 	local pickupModel = GetHashKey("p_moneybag02x")
 
 	if dropAll then
-		local randomOffsetX = math.random(-3, 3)
-		local randomOffsetY = math.random(-3, 3)
+		local randomOffsetX = math.random(-35, 35)
+		local randomOffsetY = math.random(-35, 35)
 
 		position = vector3(lastCoords.x + (randomOffsetX / 10.0), lastCoords.y + (randomOffsetY / 10.0), lastCoords.z)
 	end
@@ -138,15 +138,18 @@ PickupsService.DeadActions = function ()
 	lastCoords = GetEntityCoords(PlayerPedId(), true, true)
 	dropAll = true
 
-	if Config.DropOnRespawn.Money then
-		TriggerServerEvent("vorpinventory:serverDropAllMoney")
-	end
-
 	PickupsService.dropAllPlease()
 end
 
 PickupsService.dropAllPlease = function ()
 	Wait(200)
+
+
+	if Config.DropOnRespawn.Money then
+		TriggerServerEvent("vorpinventory:serverDropAllMoney")
+		Wait(200)
+	end
+
 	if Config.DropOnRespawn.Items then
 		local items = UserInventory
 
@@ -154,7 +157,7 @@ PickupsService.dropAllPlease = function ()
 			local itemName = item:getName()
 			local itemCount = item:getCount()
 
-			TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount, 1)
+			TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount)
 			UserInventory[itemName]:quitCount(itemCount)
 
 			if UserInventory[itemName]:getCount() == 0 then
@@ -180,12 +183,9 @@ PickupsService.dropAllPlease = function ()
 				end
 
 				UserWeapons[index] = nil
+				Wait(200)
 			end
 		end
-	end
-
-	if Config.DropOnRespawn.Money then
-		TriggerServerEvent("vorpinventory:serverDropAllMoney")
 	end
 
 	Wait(200)

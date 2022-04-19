@@ -10,6 +10,9 @@ AddEventHandler("vorpCoreClient:subWeapon", InventoryApiService.subWeapon)
 RegisterNetEvent("vorpCoreClient:addBullets")
 AddEventHandler("vorpCoreClient:addBullets", InventoryApiService.addWeaponBullets)
 
+RegisterNetEvent("vorpCoreClient:subBullets")
+AddEventHandler("vorpCoreClient:subBullets", InventoryApiService.subWeaponBullets)
+
 RegisterNetEvent("vorpCoreClient:addComponent")
 AddEventHandler("vorpCoreClient:addComponent", InventoryApiService.addComponent)
 
