@@ -9,10 +9,10 @@ Locales["en_lang"] = {
     TryExploits       = "Don`t try to outsmart the system",
     TakeFromFloor     = "Pickup",
     NotEnoughMoney    = "You don`t have enough money",
-    YouPaid           = "You have paid {0}$ to {1}",
-    YouReceived       = "You have received {0}$ from {1}",
-    YouReceiveditem   = "You have received an item ",
-    yougaveitem       = "You have gave an item ",
+    YouPaid           = "You have paid %d$ to %s",
+    YouReceived       = "You have received %d$ from %s",
+    YouReceivedItem   = "You have received an item",
+    yougaveitem       = "You have gave an item",
     itemerror         = "Invalid ",
 }
 

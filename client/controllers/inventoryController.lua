@@ -13,8 +13,8 @@ AddEventHandler("vorp:SelectedCharacter", InventoryService.onSelectedCharacter)
 RegisterNetEvent("vorpInventory:receiveItem")
 AddEventHandler("vorpInventory:receiveItem", InventoryService.receiveItem)
 
-RegisterNetEvent("vorpInventory:receiveItem2")
-AddEventHandler("vorpInventory:receiveItem2", InventoryService.receiveItem2)
+RegisterNetEvent("vorpInventory:removeItem")
+AddEventHandler("vorpInventory:removeItem", InventoryService.removeItem)
 
 RegisterNetEvent("vorpInventory:receiveWeapon")
 AddEventHandler("vorpInventory:receiveWeapon", InventoryService.receiveWeapon)

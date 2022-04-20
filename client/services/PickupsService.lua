@@ -84,7 +84,8 @@ PickupsService.sharePickupClient = function (name, obj, amount, position, value,
 			coords = position
 		}
 	else
-		WorldPickups[obj] = nil
+		-- WorldPickups[obj] = nil
+		Utils.TableRemoveByKey(WorldPickups, obj)
 	end
 end
 
@@ -99,7 +100,8 @@ PickupsService.shareMoneyPickupClient = function (obj, amount, position, value)
 			coords = position
 		}
 	else
-		WorldMoneyPickups[obj] = nil
+		--WorldMoneyPickups[obj] = nil
+		Utils.TableRemoveByKey(WorldMoneyPickups, obj)
 	end
 end
 

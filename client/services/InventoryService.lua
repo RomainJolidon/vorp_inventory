@@ -57,11 +57,12 @@ InventoryService.receiveItem = function (name, amount)
 	NUIService.LoadInv()
 end
 
-InventoryService.receiveitem2 = function (name, count)
+InventoryService.removeItem = function (name, count)
 	UserInventory[name]:quitCount(count)
 
 	if UserInventory[name]:getCount() <= 0 then
-		UserInventory[name] = nil
+		--UserInventory[name] = nil
+		Utils.TableRemoveByKey(UserInventory, name)
 	end
 
 	NUIService.LoadInv()

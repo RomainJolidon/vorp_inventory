@@ -58,8 +58,8 @@ InventoryService.giveMoneyToPlayer = function (target, amount)
 		sourceCharacter.removeCurrency(0, amount)
 		targetCharacter.addCurrency(0, amount)
 		
-		TriggerClientEvent("vorp:TipRight", _source, string.format(_U("YouPaid"), amount, targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
-		TriggerClientEvent("vorp:TipRight", _target, string.format(_U("YouReceived"), amount, sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
+		TriggerClientEvent("vorp:TipRight", _source, _U("YouPaid", amount, targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
+		TriggerClientEvent("vorp:TipRight", _target, _U("YouReceived", amount, sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
 		Wait(3000)
 		TriggerClientEvent("vorp_inventory:ProcessingReady", _source)
 	end
@@ -313,7 +313,7 @@ InventoryService.DropItem = function (itemName, amount)
 	TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, 1)
 end
 
-InventoryService.GiveWeapon = function (weaponId, target) 
+InventoryService.GiveWeapon = function (weaponId, target)
 	local _source = source
 	local _target = target
 
@@ -363,10 +363,11 @@ InventoryService.GiveItem = function (itemName, amount, target)
 	InventoryService.subItem(_source, itemName, amount)
 
 	TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, amount)
-	TriggerClientEvent("vorpInventory:receiveItem2", _source, itemName, amount)
+	TriggerClientEvent("vorpInventory:removeItem", _source, itemName, amount)
 
 	TriggerClientEvent("vorp:TipRight", _source, _U("yougaveitem"), 2000)
-	TriggerClientEvent("vorp:TipRight", _target, _U("youreceiveditem"), 2000)
+	TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedItem"), 2000)
+	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount);
 end
 
 InventoryService.getItemsTable = function () 

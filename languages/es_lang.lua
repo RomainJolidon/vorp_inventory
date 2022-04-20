@@ -9,8 +9,9 @@ Locales["es_lang"] = {
     TryExploits       = "No intentes ser más listo que el sistema",
     TakeFromFloor     = "Pickup",
     NotEnoughMoney    = "No tienes tanto dinero",
-    YouPaid           = "Has pagado {0}$ a {1}",
-    YouReceived       = "Has recibido {0}$ de {1}",
-    yougaveitem       = "lhe deste algo ",
+    YouPaid           = "Has pagado %d$ a %d",
+    YouReceived       = "Has recibido %d$ de %s",
+    YouReceivedItem   = "Has recibido algo",
+    yougaveitem       = "lhe deste algo",
     itemerror         = "Invalido "
 }

@@ -17,7 +17,7 @@ AddEventHandler('syn:getnuistuff', function(x,y,mon,gol)
     })
 end)
 
-AddEventHandler('onClientResourceStart', function (resourceName)
+AddEventHandler('onClientResourceStart', function (resourceName) -- TODO remove once dev finished
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end

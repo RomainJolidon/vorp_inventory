@@ -175,7 +175,7 @@ NUIService.NUIGetNearPlayers = function (obj)
 	nuiReturn.type = item.type
 	nuiReturn.what = item.what
 
-	SendNUIMessage(json.encode(nuiReturn))
+	SendNUIMessage(nuiReturn)
 end
 
 NUIService.NUIGiveItem = function (obj)
@@ -194,12 +194,14 @@ NUIService.NUIGiveItem = function (obj)
 				if data2.type == "item_money" then
 					if isProcessingPay then return end
 					isProcessingPay = true
-					TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, data2.count)
+					TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, tonumber(data2.count))
 				elseif tonumber(data2.id) == 0 then
 					local amount = tonumber(data2.count)
 
 					if amount > 0 and UserInventory[itemName]:getCount() >= amount then
 						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, 1)
+					else
+						-- TODO error message: Invalid amount of item
 					end
 				else
 					TriggerServerEvent("vorpinventory:serverGiveWeapon2", tonumber(data2.id), target)
