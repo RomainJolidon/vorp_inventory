@@ -40,7 +40,7 @@ exports('vorp_inventoryApi',function()
         return bull
     end
     
-    self.getWeaponComponents = function(source,weaponId) -- TODO NOT IMPLEMENTED
+    self.getWeaponComponents = function(source,weaponId)
         local comp
         TriggerEvent("vorpCore:getWeaponComponents",source,function(components)
             comp = components

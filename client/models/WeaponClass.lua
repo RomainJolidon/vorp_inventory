@@ -122,6 +122,14 @@ function Weapon:getAmmo(type)
 	return 0
 end
 
+function Weapon:getTotalAmmoCount()
+	local count = 0
+	for _, value in pairs(self.ammo) do
+		count = count + value
+	end
+	return count
+end
+
 function Weapon:setAmmo(type, amount)
 	self.ammo[type] = tonumber(amount)
 	TriggerServerEvent("vorpinventory:setWeaponBullets", self.id, type, amount)

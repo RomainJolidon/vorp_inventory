@@ -331,7 +331,7 @@ NUIService.LoadInv = function ()
 
 	for _, currentWeapon in  pairs(UserWeapons) do
 		local weapon = {}
-		weapon.count = 0 -- TODO Replace by number of ammo (all types or one specific tipe ?)
+		weapon.count = currentWeapon:getTotalAmmoCount() -- TODO Replace by number of ammo (all types or one specific tipe ?)
 		weapon.limit = -1
 		weapon.label = currentWeapon:getLabel() -- Citizen.InvokeNative(0x89CF5FF3D363311E, GetHashKey(currentWeapon:getName()))
 		weapon.name = currentWeapon:getName()
