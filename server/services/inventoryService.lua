@@ -228,7 +228,7 @@ InventoryService.onPickup = function (obj)
 
 				InventoryService.addItem(_source, name, amount)
 
-				TriggerClientEvent("vorpInventory:sharePickUpClient", -1, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2)
+				TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2)
 				TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
 				TriggerClientEvent("vorpInventory:receiveItem", _source, name, amount)
 				TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
@@ -246,7 +246,7 @@ InventoryService.onPickup = function (obj)
 					InventoryService.addWeapon(_source, weaponId)
 
 					TriggerEvent("syn_weapons:onpickup", weaponId)
-					TriggerClientEvent("vorpInventory:sharePickUpClient", -1, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
+					TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
 					TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
 					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
 					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
@@ -333,41 +333,86 @@ InventoryService.GiveItem = function (itemName, amount, target)
 	local give = true
 	local _source = source
 	local _target = target
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local targetCharacter = Core.getUser(_target).getUsedCharacter
 
-	local sourceIdentifier = GetPlayerIdentifiers(_source)[1]
-	local targetIdentifier = GetPlayerIdentifiers(_target)[1]
+	local sourceIdentifier = sourceCharacter.identifier
+	local targetIdentifier = targetCharacter.identifier
 
 	if UsersInventories[sourceIdentifier] == nil or UsersInventories[targetIdentifier] == nil or UsersInventories[sourceIdentifier][itemName] == nil then
 		TriggerClientEvent("vorp:TipRight", _source, _U('itemerror'), 2000)
 		return
 	end
 
-	local sourceItemAmount = UsersInventories[sourceIdentifier][itemName]:getCount() 
-	local targetItemAmount = UsersInventories[targetIdentifier][itemName]:getCount() 
-	local targetItemLimit = UsersInventories[targetIdentifier][itemName]:getLimit() 
-	local targetInventoryItemCount = InventoryAPI.getUserTotalCount(targetIdentifier)
-	
-	if sourceItemAmount < amount then
+	if UsersInventories[sourceIdentifier][itemName] == nil then
 		TriggerClientEvent("vorp:TipRight", _source, _U("itemerror"), 2000)
-		TriggerClientEvent("vorp:TipRight", _target, _U("itemerror"), 2000)
-		return
+		Error.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
 	end
 
-	if targetItemAmount + amount > targetItemLimit or targetInventoryItemCount + amount > Config.MaxItemsInInventory.Items then
-		TriggerClientEvent("vorp:TipRight", _source, _U('fullinventory'), 2000)
+	local item =  UsersInventories[sourceIdentifier][itemName]
+	
+	local targetItemAmount = 0
+	local targetItemLimit = 0
+	local targetInventoryItemCount = InventoryAPI.getUserTotalCount(targetIdentifier)
+	
+	local canGiveItemToTarget = true
+	local targetItem = nil;
+	
+	if UsersInventories[targetIdentifier][itemName] ~= nil then
+		targetItem = UsersInventories[targetIdentifier][itemName]
+		targetItemAmount = targetItem:getCount()
+		targetItemLimit = targetItem:getLimit()
+
+		if targetItemAmount + amount >= targetItemLimit then
+			canGiveItemToTarget = false
+		end
+	end
+
+	if targetInventoryItemCount + amount > Config.MaxItemsInInventory.Items then
+		canGiveItemToTarget = false
+	end
+
+	if not canGiveItemToTarget then
+		TriggerClientEvent("vorp:TipRight", _source, _U('fullInventoryGive'), 2000)
 		TriggerClientEvent("vorp:TipRight", _target, _U('fullinventory'), 2000)
 		return
 	end
 
-	InventoryService.addItem(_target, itemName, amount)
-	InventoryService.subItem(_source, itemName, amount)
+	if targetItem ~= nil then
+		targetItem:addCount(amount)
+	else
+		if svItems[itemName] ~= nil then
+			UsersInventories[targetIdentifier][itemName] = Item:New({
+				count = amount,
+				limit = svItems[itemName]:getLimit(),
+				label = svItems[itemName]:getLabel(),
+				name = itemName,
+				type = "item_inventory",
+				canUse = svItems[itemName]:getCanUse(),
+				canRemove = svItems[itemName]:getCanRemove()
+			})
+		else
+			Error.error("ServerGiveItem: Server items does not contain " .. itemName .. ".")
+			return
+		end
+	end
+
+	InventoryAPI.SaveInventoryItemsSupport(_target)
+
+	item:quitCount(amount)
+
+	if item:getCount() == 0 then
+		UsersInventories[sourceIdentifier][itemName] = nil
+	end
+
+	InventoryAPI.SaveInventoryItemsSupport(_source)
 
 	TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, amount)
 	TriggerClientEvent("vorpInventory:removeItem", _source, itemName, amount)
 
 	TriggerClientEvent("vorp:TipRight", _source, _U("yougaveitem"), 2000)
 	TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedItem"), 2000)
-	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount);
+	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount)
 end
 
 InventoryService.getItemsTable = function () 

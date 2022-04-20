@@ -73,7 +73,9 @@ PickupsService.createMoneyPickup = function (amount)
 end
 
 PickupsService.sharePickupClient = function (name, obj, amount, position, value, weaponId)
+	print('Share Pickup Client: ' .. tostring(value) .. ' (1 is create object, 2 is delete)')
 	if value == 1 then
+		print('Create pickup object')
 		WorldPickups[obj] = {
 			name = name, 
 			obj = obj,
@@ -84,6 +86,7 @@ PickupsService.sharePickupClient = function (name, obj, amount, position, value,
 			coords = position
 		}
 	else
+		print('Delete pickup object')
 		-- WorldPickups[obj] = nil
 		Utils.TableRemoveByKey(WorldPickups, obj)
 	end
@@ -206,10 +209,10 @@ PickupsService.principalFunctionsPickups = function ()
 		local pickupCoords = vector3(pickup.coords.x, pickup.coords.y, pickup.coords.z)
 		local distance = #(pickupCoords - coords)
 
-		if distance <= 5.0 and not pickup.inRange then
+		if distance <= 5.0 then
 			if pickup.weaponid == 1 then
 				local name = pickup.name
-				if next(DB_Items[name]) ~= nil then
+				if DB_Items[name] ~= nil then
 					name = DB_Items[name].label
 				end
 				Utils.DrawText3D(pickup.coords, name)
