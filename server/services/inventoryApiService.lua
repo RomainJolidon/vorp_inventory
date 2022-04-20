@@ -242,7 +242,7 @@ InventoryAPI.addBullets = function(player, weaponId, bulletType, amount)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
-	if (UsersWeapons[weaponId]) ~= nil then
+	if UsersWeapons[weaponId] ~= nil then
 		if UsersWeapons[weaponId]:getPropietary() == identifier then
 			UsersWeapons[weaponId]:addAmmo(bulletType, amount)
 			TriggerClientEvent("vorpCoreClient:addBullets", _source, weaponId, bulletType, amount)
@@ -571,7 +571,6 @@ InventoryAPI.onNewCharacter = function(playerId)
 	-- Attempt to add all starter items/weapons from the Config.lua
 	for key, value in pairs(Config.startItems) do
 
-		Error.print("print:" .. key .. "" .. value .. "")
 		TriggerEvent("vorpCore:addItem", playerId, tostring(key), tonumber(value))
 	end
 

@@ -263,8 +263,8 @@ NUIService.NUIUseItem = function (data)
         local isWeaponARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, GetHashKey(UserWeapons[weaponId]:getName()))
         local isWeaponAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, GetHashKey(UserWeapons[weaponId]:getName()))
         -- local weaponName = Citizen.InvokeNative(0x6D3AC61694A791C5, weaponHash)
-		local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId(), 1)
-		
+		local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId(), 4)
+
         -- Check if the weapon used is a pistol or a revolver and ped is not unarmed.
         if (isWeaponARevolver or isWeaponAPistol) and isArmed then
             local isWeaponUsedARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, weaponHash)

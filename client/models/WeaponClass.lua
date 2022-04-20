@@ -41,7 +41,7 @@ function Weapon:loadAmmo()
 		end
 		SetPedAmmo(PlayerPedId(), GetHashKey(self.name), 0)
 		for key, value in pairs(self.ammo) do
-			SetPedAmmoByType(PlayerPedId(), GetHashKey(self.name), value)
+			SetPedAmmoByType(PlayerPedId(), GetHashKey(key), value)
 		end
 	end
 end
@@ -129,18 +129,19 @@ end
 
 function Weapon:addAmmo(type, amount)
 	if self.ammo[type] ~= nil then
-		self.ammo[type] = self.ammo[type] + amount
+		self.ammo[type] = self.ammo[type] + tonumber(amount)
 	else
-		self.ammo[type] = amount
+		self.ammo[type] = tonumber(amount)
 	end
 end
 
 function Weapon:subAmmo(type, amount)
 	if self.ammo[type] ~= nil then
-		self.ammo[type] = self.ammo[type] - amount
+		self.ammo[type] = self.ammo[type] - tonumber(amount)
 
 		if self.ammo[type] <= 0 then
-			self.ammo[type] = nil
+			Utils.TableRemoveByKey(self.ammo, type)
+			--self.ammo[type] = nil
 		end
 	end
 end
