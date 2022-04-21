@@ -179,3 +179,25 @@ InventoryService.getInventory = function (inventory)
 		end
 	end
 end
+
+
+-- Threads
+Citizen.CreateThread(function()
+	while true do
+		Wait(500)
+
+		local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId(), 4)
+		
+		if isArmed then
+			for _, weapon in pairs(UserWeapons) do
+				if weapon:getUsed() then
+					local ammo = weapon:getAllAmmo()
+					for ammoName, _ in pairs(ammo) do
+						local ammoQty = Citizen.InvokeNative(0x39D22031557946C1, PlayerPedId(), GetHashKey(ammoName))
+						weapon:setAmmo(ammoName, ammoQty)
+					end
+				end
+			end
+		end
+	end
+end)
