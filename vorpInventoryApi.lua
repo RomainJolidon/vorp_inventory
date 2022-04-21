@@ -29,7 +29,11 @@ exports('vorp_inventoryApi',function()
     end
 
     self.addBullets = function(source,weaponId,type,cuantity)
-        TriggerEvent("vorpCoreClient:addBullets",source,weaponId,type,cuantity)
+        TriggerEvent("vorpCore:addBullets",source,weaponId,type,cuantity)
+    end
+
+    self.subBullets = function(source,weaponId,type,cuantity)
+        TriggerEvent("vorpCore:subBullets",source,weaponId,type,cuantity)
     end
 
     self.getWeaponBullets = function(source,weaponId)

@@ -238,6 +238,7 @@ InventoryAPI.getWeaponBullets = function(player, cb, weaponId)
 end
 
 InventoryAPI.addBullets = function(player, weaponId, bulletType, amount)
+	print('add bullets')
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -312,42 +313,50 @@ InventoryAPI.addItem = function(player, name, amount)
 	local sourceItemLimit = svItems[name]:getLimit()
 	local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier) + amount
 
-	if UsersInventories[identifier][name] == nil then
-		if amount > sourceItemLimit and sourceInventoryItemCount > Config.MaxItemsInInventory.Items and Config.MaxItemsInInventory.Items ~= 0 and svItems[sourceItemLimit] ~= -1 then
-			return
-		else
+	if UsersInventories[identifier][name] ~= nil then
+		if UsersInventories[identifier][name]:getCount() + amount <= sourceItemLimit or sourceItemLimit == -1 then
+			if Config.MaxItemsInInventory.Items ~= -1 then
+				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+					UsersInventories[identifier][name]:addCount(amount)
+					added = true
+				end
+			else
+				UsersInventories[identifier][name]:addCount(amount)
+				added = true
+			end
+		end
+	else
+		if amount <= sourceItemLimit or sourceItemLimit == -1 then
 			local itemLabel = svItems[name]:getLabel()
 			local itemType = svItems[name]:getType()
 			local itemCanRemove = svItems[name]:getCanRemove()
 
-			UsersInventories[identifier][name] = Item:New({
-				count = amount,
-				limit = sourceItemLimit,
-				label = itemLabel,
-				name = name,
-				type = itemType,
-				usable = true,
-				canRemove = itemCanRemove
-			})
-			added = true
-		end
-	end
-
-	local sourceItemCount = UsersInventories[identifier][name]:getCount()
-
-	if not added then
-		if sourceItemCount + amount > sourceItemLimit and sourceItemLimit ~= -1 then
-			return
-		end
-
-		if Config.MaxItemsInInventory.Items ~= 0 then
-			if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
-				return
+			if Config.MaxItemsInInventory.Items ~= -1 then
+				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+					UsersInventories[identifier][name] = Item:New({
+						count = amount,
+						limit = sourceItemLimit,
+						label = itemLabel,
+						name = name,
+						type = itemType,
+						usable = true,
+						canRemove = itemCanRemove
+					})
+					added = true
+				end
+			else
+				UsersInventories[identifier][name] = Item:New({
+					count = amount,
+					limit = sourceItemLimit,
+					label = itemLabel,
+					name = name,
+					type = itemType,
+					usable = true,
+					canRemove = itemCanRemove
+				})
+				added = true
 			end
 		end
-
-		UsersInventories[identifier][name]:addCount(amount)
-		added = true
 	end
 
 	if UsersInventories[identifier][name] ~= nil and added then
