@@ -86,13 +86,13 @@ function Weapon:addAmmo(type, amount)
 	if self.ammo[type] ~= nil then
 		self.ammo[type] = self.ammo[type] + amount
 	else
-		self.ammo[type] = amount
+		self.ammo[type] = tonumber(amount)
 	end
 	exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self:getAllAmmo()), ['id'] = self.id})
 end
 
 function Weapon:setAmmo(type, amount)
-	self.ammo[type] = amount
+	self.ammo[type] = tonumber(amount)
 	exports.ghmattimysql:execute('UPDATE loadout SET ammo = @ammo WHERE id=@id', { ['ammo'] = json.encode(self:getAllAmmo()), ['id'] = self.id})
 end
 

@@ -42,18 +42,20 @@ local LoadDatabase = function ()
 					used2 = true
 				end
 
-				local weapon = Weapon:New({
-					id = db_weapon.id,
-					propietary = db_weapon.identifier,
-					name = db_weapon.name,
-					ammo = ammo,
-					components = comp,
-					used = used,
-					used2 = used2,
-					charId = charId
-				})
-
-				UsersWeapons[weapon:getId()] = weapon
+				if db_weapon.dropped == 0 then
+					local weapon = Weapon:New({
+						id = db_weapon.id,
+						propietary = db_weapon.identifier,
+						name = db_weapon.name,
+						ammo = ammo,
+						components = comp,
+						used = used,
+						used2 = used2,
+						charId = charId
+					})
+	
+					UsersWeapons[weapon:getId()] = weapon
+				end
 			end
 		end
 	end)
