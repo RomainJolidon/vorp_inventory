@@ -4,16 +4,16 @@ MoneyPickUps = {}
 Core = {}
 
 Citizen.CreateThread(function()
-    TriggerEvent("getCore", function(core)
-        Core = core;
-    end)
+	TriggerEvent("getCore", function(core)
+		Core = core;
+	end)
 end)
 
-InventoryService.DropMoney = function (amount) 
+InventoryService.DropMoney = function(amount)
 	local _source = source
 	local userCharacter = Core.getUser(_source).getUsedCharacter
-	local userMoney = userCharacter.money	
-	
+	local userMoney = userCharacter.money
+
 	if amount <= 0 then
 		TriggerClientEvent("vorp:TipRight", _source, _U("TryExploits"), 3000)
 	elseif userMoney < amount then
@@ -25,7 +25,7 @@ InventoryService.DropMoney = function (amount)
 	end
 end
 
-InventoryService.DropAllMoney = function () 
+InventoryService.DropAllMoney = function()
 	local _source = source
 	local userCharacter = Core.getUser(_source).getUsedCharacter
 	local userMoney = userCharacter.money
@@ -37,15 +37,13 @@ InventoryService.DropAllMoney = function ()
 	end
 end
 
-InventoryService.giveMoneyToPlayer = function (target, amount) 
+InventoryService.giveMoneyToPlayer = function(target, amount)
 	local _source = source
 	local _target = target
-
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local targetCharacter = Core.getUser(_target).getUsedCharacter
-
 	local sourceMoney = sourceCharacter.money
-	
+
 	if amount <= 0 then
 		TriggerClientEvent("vorp:TipRight", _source, _U("TryExploits"), 3000)
 		Wait(3000)
@@ -57,7 +55,7 @@ InventoryService.giveMoneyToPlayer = function (target, amount)
 	else
 		sourceCharacter.removeCurrency(0, amount)
 		targetCharacter.addCurrency(0, amount)
-		
+
 		TriggerClientEvent("vorp:TipRight", _source, _U("YouPaid", amount, targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
 		TriggerClientEvent("vorp:TipRight", _target, _U("YouReceived", amount, sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
 		Wait(3000)
@@ -65,13 +63,13 @@ InventoryService.giveMoneyToPlayer = function (target, amount)
 	end
 end
 
-InventoryService.setWeaponBullets = function (weaponId, type, amount) 
+InventoryService.setWeaponBullets = function(weaponId, type, amount)
 	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setAmmo(type, amount)
 	end
 end
 
-InventoryService.SaveInventoryItemsSupport = function () 
+InventoryService.SaveInventoryItemsSupport = function()
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -84,33 +82,33 @@ InventoryService.SaveInventoryItemsSupport = function ()
 		end
 
 		if characterInventory ~= nil then
-			exports.ghmattimysql:execute('UPDATE characters SET inventory = @inventory WHERE identifier = @identifier AND charidentifier = @charid', { 
-					['inventory'] = json.encode(characterInventory), 
-					['identifier'] = identifier,
-					['charidentifier'] = charId
-				}, function() 
+			exports.ghmattimysql:execute('UPDATE characters SET inventory = @inventory WHERE identifier = @identifier AND charidentifier = @charid', {
+				['inventory'] = json.encode(characterInventory),
+				['identifier'] = identifier,
+				['charidentifier'] = charId
+			}, function()
 			end)
 		end
 	end
 end
 
-InventoryService.usedWeapon = function (id, _used, _used2) 
+InventoryService.usedWeapon = function(id, _used, _used2)
 	local used = 0
 	local used2 = 0
 
 	if _used then used = 1 end
 	if _used2 then used2 = 1 end
 
-	exports.ghmattimysql:execute('UPDATE loadout SET used = @used, used2 = @used2 WHERE id = @id', { 
-			['used'] = used, 
-			['used2'] = used2,
-			['id'] = id
-		}, function() 
+	exports.ghmattimysql:execute('UPDATE loadout SET used = @used, used2 = @used2 WHERE id = @id', {
+		['used'] = used,
+		['used2'] = used2,
+		['id'] = id
+	}, function()
 	end)
 end
 
-InventoryService.subItem = function (target, name, amount) 
-	local _source = target 
+InventoryService.subItem = function(target, name, amount)
+	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
@@ -119,7 +117,7 @@ InventoryService.subItem = function (target, name, amount)
 			if amount <= UsersInventories[identifier][name]:getCount() then
 				UsersInventories[identifier][name]:quitCount(amount)
 			end
-			
+
 			if UsersInventories[identifier][name]:getCount() == 0 then
 				UsersInventories[identifier][name] = nil
 			end
@@ -128,7 +126,7 @@ InventoryService.subItem = function (target, name, amount)
 	end
 end
 
-InventoryService.addItem = function (target, name, amount) 
+InventoryService.addItem = function(target, name, amount)
 	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -148,7 +146,7 @@ InventoryService.addItem = function (target, name, amount)
 					name = name,
 					type = "item_inventory",
 					canUse = svItems[name]:getCanUse(),
-					canRemove = svItems[name]:getCanRemove() 
+					canRemove = svItems[name]:getCanRemove()
 				})
 				InventoryService.SaveInventoryItemsSupport()
 			end
@@ -156,33 +154,33 @@ InventoryService.addItem = function (target, name, amount)
 	end
 end
 
-InventoryService.addWeapon = function (target, weaponId) 
+InventoryService.addWeapon = function(target, weaponId)
 	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
-	
+
 	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setPropietary(identifier)
-		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
-			['identifier'] = identifier, 
+		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', {
+			['identifier'] = identifier,
 			['charid'] = charId,
 			['id'] = weaponId
-		}, function() 
+		}, function()
 		end)
 	end
 end
 
-InventoryService.subWeapon = function (target, weaponId) 
-	local _source = target 
+InventoryService.subWeapon = function(target, weaponId)
+	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
-	
-	if UsersWeapons[weaponId] ~= nil then	
+
+	if UsersWeapons[weaponId] ~= nil then
 		UsersWeapons[weaponId]:setPropietary('')
-		
-		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', { 
+
+		exports.ghmattimysql:execute('UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id', {
 			['identifier'] = identifier,
 			['charid'] = charId,
 			['id'] = weaponId
@@ -190,8 +188,8 @@ InventoryService.subWeapon = function (target, weaponId)
 	end
 end
 
-InventoryService.onPickup = function (obj) 
-	local _source = source 
+InventoryService.onPickup = function(obj)
+	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
@@ -204,13 +202,13 @@ InventoryService.onPickup = function (obj)
 
 			if UsersInventories[identifier] ~= nil then
 				if svItems[name]:getLimit() ~= -1 then
-				
+
 					if UsersInventories[identifier][name] ~= nil then
 						local sourceItemCount = UsersInventories[identifier][name]:getCount()
 						local totalAmount = amount + sourceItemCount
 
 						if svItems[name]:getLimit() < totalAmount then
-							TriggerClientEvent(player, "vorp:TipRight", _U("fullInventory"), 2000)
+							TriggerClientEvent(_source, "vorp:TipRight", _U("fullInventory"), 2000)
 							return
 						end
 					end
@@ -218,7 +216,7 @@ InventoryService.onPickup = function (obj)
 
 				if Config.MaxItemsInInventory.Items ~= 0 then
 					local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier)
-					sourceInventoryItemCount = sourceInventoryItemCount + amount 
+					sourceInventoryItemCount = sourceInventoryItemCount + amount
 
 					if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
 						TriggerClientEvent("vorp:TipRight", _source, _U(fullInventory), 2000)
@@ -257,7 +255,7 @@ InventoryService.onPickup = function (obj)
 	end
 end
 
-InventoryService.onPickupMoney = function (obj) 
+InventoryService.onPickupMoney = function(obj)
 	local _source = source
 
 	if MoneyPickUps[obj] ~= nil then
@@ -274,8 +272,7 @@ InventoryService.onPickupMoney = function (obj)
 	end
 end
 
-InventoryService.sharePickupServer = function (name, obj, amount, position, weaponId) 
-	local _source = source
+InventoryService.sharePickupServer = function(name, obj, amount, position, weaponId)
 	TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, obj, amount, position, 1, weaponId)
 
 	ItemPickUps[obj] = {
@@ -288,9 +285,9 @@ InventoryService.sharePickupServer = function (name, obj, amount, position, weap
 	}
 end
 
-InventoryService.shareMoneyPickupServer = function (obj, amount, position) 
-	local _source = source
+InventoryService.shareMoneyPickupServer = function(obj, amount, position)
 	TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, obj, amount, position, 1)
+
 	MoneyPickUps[obj] = {
 		name = "Dollars",
 		obj = obj,
@@ -301,19 +298,21 @@ InventoryService.shareMoneyPickupServer = function (obj, amount, position)
 end
 
 
-InventoryService.DropWeapon = function (weaponId) 
+InventoryService.DropWeapon = function(weaponId)
 	local _source = source
 	InventoryService.subWeapon(_source, weaponId)
+
 	TriggerClientEvent("vorpInventory:createPickup", _source, UsersWeapons[weaponId]:getName(), 1, weaponId)
 end
 
-InventoryService.DropItem = function (itemName, amount)
-	local _source = source 
+InventoryService.DropItem = function(itemName, amount)
+	local _source = source
 	InventoryService.subItem(_source, itemName, amount)
+
 	TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, 1)
 end
 
-InventoryService.GiveWeapon = function (weaponId, target)
+InventoryService.GiveWeapon = function(weaponId, target)
 	local _source = source
 	local _target = target
 
@@ -329,8 +328,7 @@ InventoryService.GiveWeapon = function (weaponId, target)
 	end
 end
 
-InventoryService.GiveItem = function (itemName, amount, target) 
-	local give = true
+InventoryService.GiveItem = function(itemName, amount, target)
 	local _source = source
 	local _target = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -346,18 +344,19 @@ InventoryService.GiveItem = function (itemName, amount, target)
 
 	if UsersInventories[sourceIdentifier][itemName] == nil then
 		TriggerClientEvent("vorp:TipRight", _source, _U("itemerror"), 2000)
-		Error.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
+
+		if Config.Debug then
+			Error.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
+		end
 	end
 
-	local item =  UsersInventories[sourceIdentifier][itemName]
-	
+	local item = UsersInventories[sourceIdentifier][itemName]
 	local targetItemAmount = 0
 	local targetItemLimit = 0
 	local targetInventoryItemCount = InventoryAPI.getUserTotalCount(targetIdentifier)
-	
 	local canGiveItemToTarget = true
 	local targetItem = nil;
-	
+
 	if UsersInventories[targetIdentifier][itemName] ~= nil then
 		targetItem = UsersInventories[targetIdentifier][itemName]
 		targetItemAmount = targetItem:getCount()
@@ -392,13 +391,14 @@ InventoryService.GiveItem = function (itemName, amount, target)
 				canRemove = svItems[itemName]:getCanRemove()
 			})
 		else
-			Error.error("ServerGiveItem: Server items does not contain " .. itemName .. ".")
+			if Config.Debug then
+				Error.error("ServerGiveItem: Server items does not contain " .. itemName .. ".")
+			end
 			return
 		end
 	end
 
 	InventoryAPI.SaveInventoryItemsSupport(_target)
-
 	item:quitCount(amount)
 
 	if item:getCount() == 0 then
@@ -415,7 +415,7 @@ InventoryService.GiveItem = function (itemName, amount, target)
 	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount)
 end
 
-InventoryService.getItemsTable = function () 
+InventoryService.getItemsTable = function()
 	local _source = source
 
 	if DB_Items ~= nil then
@@ -423,20 +423,19 @@ InventoryService.getItemsTable = function ()
 	end
 end
 
-InventoryService.getInventory = function () 
+InventoryService.getInventory = function()
 	local _source = source
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 
 	if sourceCharacter == nil then
 		return
 	end
-	
+
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
 	local sourceInventory = json.decode(sourceCharacter.inventory)
 
 	local characterInventory = {}
-	local characterWeapons = {}
 
 	if sourceInventory ~= nil then
 		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
@@ -455,40 +454,40 @@ InventoryService.getInventory = function ()
 		end
 	end
 	UsersInventories[sourceIdentifier] = characterInventory
-	
+
 	TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(sourceInventory))
 
-	exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', { 
-			['identifier'] = sourceIdentifier,
-			['charid'] = sourceCharId,
-		}, 
-	function(result)
-		if result ~= nil then
-			for _, weapon in pairs(result) do
-				local db_Ammo = json.decode(weapon.ammo)
-				local weaponAmmo = {}
-				local used = false
-				local used2 = false
+	exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', {
+		['identifier'] = sourceIdentifier,
+		['charid'] = sourceCharId,
+	},
+		function(result)
+			if result ~= nil then
+				for _, weapon in pairs(result) do
+					local db_Ammo = json.decode(weapon.ammo)
+					local weaponAmmo = {}
+					local used = false
+					local used2 = false
 
-				for _, ammo in pairs(db_Ammo) do
-					weaponAmmo[_] = ammo
+					for _, ammo in pairs(db_Ammo) do
+						weaponAmmo[_] = ammo
+					end
+
+					if weapon.used == 1 then used = true end
+					if weapon.used2 == 1 then used2 = true end
+
+					local newWeapon = Weapon:New({
+						id = weapon.id,
+						propietary = weapon.identifier,
+						name = weapon.name,
+						ammo = weaponAmmo,
+						used = used,
+						used2 = used2,
+						charId = sourceCharId,
+					})
+					UsersWeapons[newWeapon:getId()] = newWeapon
 				end
-
-				if weapon.used == 1 then used = true end
-				if weapon.used2 == 1 then used2 = true end
-
-				local newWeapon = Weapon:New({
-					id = weapon.id,
-					propietary = weapon.identifier,
-					name = weapon.name,
-					ammo = weaponAmmo,
-					used = used,
-					used2 = used2,
-					charId = sourceCharId,
-				})
-				UsersWeapons[newWeapon:getId()] = newWeapon
+				TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 			end
-			TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
-		end
-	end)
+		end)
 end
