@@ -373,7 +373,7 @@ InventoryService.GiveItem = function(itemName, amount, target)
 
 	if not canGiveItemToTarget then
 		TriggerClientEvent("vorp:TipRight", _source, _U('fullInventoryGive'), 2000)
-		TriggerClientEvent("vorp:TipRight", _target, _U('fullinventory'), 2000)
+		TriggerClientEvent("vorp:TipRight", _target, _U('fullInventory'), 2000)
 		return
 	end
 
