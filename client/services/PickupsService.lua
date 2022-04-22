@@ -1,19 +1,43 @@
 PickupsService = {}
 
-local PickPrompt = nil
+local promptGroup = GetRandomIntInRange(0, 0xffffff)
+--local PickPrompt = nil
 local WorldPickups = {}
-local WorldMoneyPickups = {}
+--local WorldMoneyPickups = {}
 
 local dropAll = false
 local lastCoords = {}
 
+PickupsService.CreateObject = function(model, position)
+	local objectHash = GetHashKey(model)
+
+	if not Citizen.InvokeNative(0x1283B8B89DD5D1B6, objectHash) then -- HasModelLoaded
+		Citizen.InvokeNative(0xFA28FE3A6246FC30, objectHash) -- RequestModel
+	end
+
+	while not Citizen.InvokeNative(0x1283B8B89DD5D1B6, objectHash) do -- HasModelLoaded
+		Wait(1)
+	end
+
+	local entityHandle = Citizen.InvokeNative(0x509D5878EB39E842, objectHash, position.x, position.y, position.z, true, true, true) -- CreateObject
+
+	Citizen.InvokeNative(0x58A850EAEE20FAA3, entityHandle) -- PlaceObjectOnGroundProperly
+	Citizen.InvokeNative(0xDC19C288082E586E, entityHandle, true, false) -- SetEntityAsMissionEntity
+	Citizen.InvokeNative(0x7D9EFB7AD6B19754, entityHandle, true) -- FreezeEntityPosition
+	Citizen.InvokeNative(0x7DFB49BCDB73089A, entityHandle, true) -- SetPickupLight
+	Citizen.InvokeNative(0xF66F820909453B8C, entityHandle, false, true) -- SetEntityCollision
+	
+	SetModelAsNoLongerNeeded(objectHash)
+
+	return entityHandle
+end
 
 PickupsService.createPickup = function (name, amount, weaponId)
 	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed, true, true)
 	local forward = GetEntityForwardVector(playerPed)
 	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
-	local pickupModel = GetHashKey("P_COTTONBOX01X")
+	local pickupModel = "P_COTTONBOX01X"
 
 
 	if dropAll then
@@ -23,21 +47,10 @@ PickupsService.createPickup = function (name, amount, weaponId)
 		position = vector3(lastCoords.x + (randomOffsetX / 10.0), lastCoords.y + (randomOffsetY / 10.0), lastCoords.z)
 	end
 
-	if not Citizen.InvokeNative(0x1283B8B89DD5D1B6, pickupModel) then
-		Citizen.InvokeNative(0xFA28FE3A6246FC30, pickupModel)
-	end
+	local entityHandle = PickupsService.CreateObject(pickupModel, position)
 
-	while not HasModelLoaded(pickupModel) do
-		Wait(1)
-	end
-
-	local obj = Citizen.InvokeNative(0x509D5878EB39E842, pickupModel, position.x, position.y, position.z, true, true, true)
-	Citizen.InvokeNative(0x58A850EAEE20FAA3, obj)
-	Citizen.InvokeNative(0xDC19C288082E586E, obj, true, true)
-	Citizen.InvokeNative(0x7D9EFB7AD6B19754, obj, true)
-
-	TriggerServerEvent("vorpinventory:sharePickupServer", name, obj, amount, position, weaponId)
-	Citizen.InvokeNative(0x67C540AA08E4A6F5, "show_info", "Study_Sounds", true, 0)
+	TriggerServerEvent("vorpinventory:sharePickupServer", name, entityHandle, amount, position, weaponId)
+	Citizen.InvokeNative(0x67C540AA08E4A6F5, "show_info", "Study_Sounds", true, 0) -- PlaySoundFrontend
 
 end
 
@@ -46,7 +59,7 @@ PickupsService.createMoneyPickup = function (amount)
 	local coords = GetEntityCoords(playerPed, true, true)
 	local forward = GetEntityForwardVector(playerPed)
 	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
-	local pickupModel = GetHashKey("p_moneybag02x")
+	local pickupModel = "p_moneybag02x"
 
 	if dropAll then
 		local randomOffsetX = math.random(-35, 35)
@@ -55,64 +68,68 @@ PickupsService.createMoneyPickup = function (amount)
 		position = vector3(lastCoords.x + (randomOffsetX / 10.0), lastCoords.y + (randomOffsetY / 10.0), lastCoords.z)
 	end
 
-	if not Citizen.InvokeNative(0x1283B8B89DD5D1B6, pickupModel) then
-		Citizen.InvokeNative(0xFA28FE3A6246FC30, pickupModel)
-	end
+	local entityHandle = PickupsService.CreateObject(pickupModel, position)
 
-	while not HasModelLoaded(pickupModel) do
-		Wait(1)
-	end
-
-	local obj = Citizen.InvokeNative(0x509D5878EB39E842, pickupModel, position.x, position.y, position.z, true, true, true)
-	Citizen.InvokeNative(0x58A850EAEE20FAA3, obj)
-	Citizen.InvokeNative(0xDC19C288082E586E, obj, true, true)
-	Citizen.InvokeNative(0x7D9EFB7AD6B19754, obj, true)
-
-	TriggerServerEvent("vorpinventory:shareMoneyPickupServer", obj, amount, position)
-	Citizen.InvokeNative(0x67C540AA08E4A6F5, "show_info", "Study_Sounds", true, 0)
+	TriggerServerEvent("vorpinventory:shareMoneyPickupServer", entityHandle, amount, position)
+	Citizen.InvokeNative(0x67C540AA08E4A6F5, "show_info", "Study_Sounds", true, 0) -- PlaySoundFrontend
 end
 
-PickupsService.sharePickupClient = function (name, obj, amount, position, value, weaponId)
-	print('Share Pickup Client: ' .. tostring(value) .. ' (1 is create object, 2 is delete)')
+PickupsService.sharePickupClient = function (name, entityHandle, amount, position, value, weaponId)
 	if value == 1 then
-		print('Create pickup object')
-		WorldPickups[obj] = {
-			name = name, 
-			obj = obj,
-			amount = amount,
-			weaponid = weaponId,
-			inRange = false,
-			active = false,
-			coords = position
-		}
+		if WorldPickups[entityHandle] == nil then
+			local label = Utils.GetHashreadableLabel(name, weaponId)
+
+			local pickup = Pickup:New({
+				name = (amount > 1) and label .. " x " .. tostring(amount) or label,
+				entityId = entityHandle,
+				amount = amount,
+				weaponId = weaponId,
+				coords = position,
+				prompt = Prompt:New(0xF84FA74F, _U("TakeFromFloor"), PromptType.StandardHold, promptGroup)
+			})
+
+			--pickup.prompt:SetEnabled(false)
+			pickup.prompt:SetVisible(false)
+			WorldPickups[entityHandle] = pickup
+
+			print('Item pickup added: ' .. tostring(pickup.name))
+		end
 	else
-		print('Delete pickup object')
 		-- WorldPickups[obj] = nil
-		Utils.TableRemoveByKey(WorldPickups, obj)
+		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end
 
-PickupsService.shareMoneyPickupClient = function (obj, amount, position, value)
+PickupsService.shareMoneyPickupClient = function (entityHandle, amount, position, value)
 	if value == 1 then
-		WorldMoneyPickups[obj] = {
-			name = "money",
-			obj = obj,
-			amount = amount,
-			inRange = false,
-			active = false,
-			coords = position
-		}
+		if WorldPickups[entityHandle] == nil then
+			local pickup = Pickup:New({
+				name = "Money (" .. tostring(amount) ..")",
+				entityId = entityHandle,
+				amount = amount,
+				isMoney = true,
+				coords = position,
+				prompt = Prompt:New(0xF84FA74F, _U("TakeFromFloor"), PromptType.StandardHold, promptGroup)
+			})
+
+			--pickup.prompt:SetEnabled(false)
+			pickup.prompt:SetVisible(false)
+			WorldPickups[entityHandle] = pickup
+
+			print('Money pickup added: ' .. tostring(pickup.name))
+		end
 	else
-		--WorldMoneyPickups[obj] = nil
-		Utils.TableRemoveByKey(WorldMoneyPickups, obj)
+		-- WorldPickups[obj] = nil
+		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end
 
-PickupsService.removePickupClient = function (obj)
-	Citizen.InvokeNative(0xDC19C288082E586E, obj, false, true)
+PickupsService.removePickupClient = function (entityHandle)
+	Citizen.InvokeNative(0xDC19C288082E586E, entityHandle, false, true) -- SetEntityAsMissionEntity
+	NetworkRequestControlOfEntity(entityHandle)
 	local timeout = 0
 
-	while not NetworkHasControlOfEntity(obj) and timeout < 5000 do
+	while not NetworkHasControlOfEntity(entityHandle) and timeout < 5000 do
 		timeout = timeout + 100
 		if timeout == 5000 then
 			print("Failed to get Control of the Entity")
@@ -120,8 +137,9 @@ PickupsService.removePickupClient = function (obj)
 		Wait(100)
 	end
 
-	Citizen.InvokeNative(0x7D9EFB7AD6B19754, obj, false)
-	DeleteObject(obj)
+	Citizen.InvokeNative(0x7D9EFB7AD6B19754, entityHandle, false) -- FreezeEntityPosition
+	Citizen.InvokeNative(0x7DFB49BCDB73089A, entityHandle, false) -- SetPickupLight
+	DeleteObject(entityHandle)
 end
 
 PickupsService.playerAnim = function (obj)
@@ -197,126 +215,65 @@ PickupsService.dropAllPlease = function ()
 	dropAll = false
 end
 
-PickupsService.principalFunctionsPickups = function ()
-	local playerPed = PlayerPedId()	
-	local coords = GetEntityCoords(playerPed, true, true)
-
+PickupsService.OnWorldPickup = function()
 	if next(WorldPickups) == nil then
+		Wait(1000)
 		return 
 	end
 
-	for _, pickup in pairs(WorldPickups) do
-		local pickupCoords = vector3(pickup.coords.x, pickup.coords.y, pickup.coords.z)
-		local distance = #(pickupCoords - coords)
-
-		if distance <= 5.0 then
-			if pickup.weaponid == 1 then
-				local name = pickup.name
-				if DB_Items[name] ~= nil then
-					name = DB_Items[name].label
-				end
-				Utils.DrawText3D(pickup.coords, name)
-			else
-				local name = Utils.GetWeaponLabel(pickup.name)
-				Utils.DrawText3D(pickup.coords, name)
-			end
-		end
-
-		if distance <= 1.2 and not pickup.inRange then
-			TaskLookAtEntity(playerPed, pickup.obj, 3000, 2048, 3)
-
-			if not pickup.active then
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, true)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, true)
-				pickup.active = true
-			end
-
-			if Citizen.InvokeNative(0xE0F65F0640EF0617, PickPrompt) then
-				TriggerServerEvent("vorpinventory:onPickup", pickup.obj)
-				pickup.inRange = true
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-			end
-		else
-			if pickup.active then
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-				pickup.active = false
-			end
-		end
-	end
-end
-
-PickupsService.principalFunctionsPickupsMoney = function () -- Tick
 	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed, true, true)
+	local pickupsInRange = {}
 
-	if next(WorldMoneyPickups) == nil then
-		return
+	for key, value in pairs(WorldPickups) do
+		if value:IsInRange() then
+			table.insert(pickupsInRange, value)
+		end
 	end
 
-	for _, pickup in pairs(WorldMoneyPickups) do
-		local pickupCoords = vector3(pickup.coords.x, pickup.coords.y, pickup.coords.z)
-		local distance = #(pickupCoords - coords)
+	table.sort(pickupsInRange, function (left, right)
+		return left:Distance() < right:Distance()
+	end)
 
-		if distance <= 5.0 then
-			Utils.DrawText3D(pickup.coords, pickup.name)
-		end
 
-		if distance <= 1.2 and not pickup.inRange then
-			Citizen.InvokeNative(0x69F4BE8C8CC4796C, playerPed, pickup.obj, 3000, 2048, 3)
+	for _, pickup in pairs(pickupsInRange) do
+		if pickup:Distance() <= 1.2 then
+			Citizen.InvokeNative(0x69F4BE8C8CC4796C, playerPed, pickup.entityId, 3000, 2048, 3) -- TaskLookAtEntity
+			local isDead = IsEntityDead(playerPed)
 
-			if not pickup.active then
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, true)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, true)
-				pickup.active = true
-			end
+			
+			pickup.prompt:SetVisible(not isDead)
 
-			if Citizen.InvokeNative(0xE0F65F0640EF0617, PickPrompt) then
-				TriggerServerEvent("vorpinventory:onPickupMoney", pickup.obj)
-				pickup.inRange = true
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
+			local promptSubLabel = CreateVarString(10, "LITERAL_STRING", pickup.name)
+			Citizen.InvokeNative(0xC65A45D4453C2627, promptGroup, promptSubLabel, 1) -- UiPromptSetActiveGroupThisFrame
+
+			if pickup.prompt:HasHoldModeCompleted() then
+				if pickup.isMoney then
+					TriggerServerEvent("vorpinventory:onPickupMoney", pickup.entityId)
+				else
+					TriggerServerEvent("vorpinventory:onPickup", pickup.entityId)
+				end
+
+				pickup.prompt:Delete()
 			end
 		else
-			if pickup.active then
-				Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
-				Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-				pickup.active = false
+			if pickup.prompt:GetEnabled() then
+				pickup.prompt:SetVisible(false)
 			end
 		end
 	end
 end
-
-PickupsService.SetupPickPrompt = function ()
-	PickPrompt = Citizen.InvokeNative(0x04F97DE45A519419)
-	local str = CreateVarString(10, "LITERAL_STRING", _U("TakeFromFloor"))
-    Citizen.InvokeNative(0x5DD02A8318420DD7, PickPrompt, str)
-    Citizen.InvokeNative(0xB5352B7494A08258, PickPrompt, 0xF84FA74F)
-    Citizen.InvokeNative(0x8A0FB4D03A630D21, PickPrompt, false)
-    Citizen.InvokeNative(0x71215ACCFDE075EE, PickPrompt, false)
-    Citizen.InvokeNative(0x94073D5CA3F16B7B, PickPrompt, true)
-    Citizen.InvokeNative(0xF7AA2696A22AD8B9, PickPrompt)
-end
-
-
-
--- Setup Thread
-Citizen.CreateThread(function()
-    PickupsService.SetupPickPrompt()
-end)
 
 -- Threads
 Citizen.CreateThread(function()
 	while true do
 		Wait(0)
-		PickupsService.principalFunctionsPickups()
+		PickupsService.OnWorldPickup()
 	end
 end)
 
-Citizen.CreateThread(function()
-	while true do
-		Wait(0)
-		PickupsService.principalFunctionsPickupsMoney()
-	end
-end)
+-- Citizen.CreateThread(function()
+-- 	while true do
+-- 		Wait(0)
+-- 		PickupsService.principalFunctionsPickupsMoney()
+-- 	end
+-- end)

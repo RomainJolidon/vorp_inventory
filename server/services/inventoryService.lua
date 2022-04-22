@@ -324,7 +324,12 @@ InventoryService.GiveWeapon = function(weaponId, target)
 		local name = UsersWeapons[weaponId]:getName()
 		local allAmmo = UsersWeapons[weaponId]:getAllAmmo()
 
+		--NOTIFY
+		TriggerClientEvent("vorp:TipRight", _source, _U("yougaveWeapon"), 2000)
+		TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedWeapon"), 2000)
+
 		TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, propietary, name, allAmmo)
+
 	end
 end
 
@@ -410,6 +415,7 @@ InventoryService.GiveItem = function(itemName, amount, target)
 	TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, amount)
 	TriggerClientEvent("vorpInventory:removeItem", _source, itemName, amount)
 
+	--NOTIFY
 	TriggerClientEvent("vorp:TipRight", _source, _U("yougaveitem"), 2000)
 	TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedItem"), 2000)
 	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount)
@@ -438,7 +444,7 @@ InventoryService.getInventory = function()
 	local characterInventory = {}
 
 	if sourceInventory ~= nil then
-		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
+		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations STILL TODO?
 			if sourceInventory[item.item] ~= nil then
 				local newItem = Item:New({
 					count = tonumber(sourceInventory[item.item]),
