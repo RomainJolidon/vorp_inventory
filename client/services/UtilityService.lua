@@ -118,7 +118,7 @@ function Utils.TableRemoveByKey(table, key)
 end
 
 function Utils.GetHashreadableLabel(hash, weaponId)
-	if weaponId > 0 then
+	if weaponId <= 1 then
 		return DB_Items[hash].label
 	else
 		return Utils.GetWeaponLabel(hash)
