@@ -180,7 +180,7 @@ InventoryAPI.registerUsableItem = function(name, cb)
 	UsableItemsFunctions[name] = cb
 	if Config.Debug then
 		Wait(9000) -- so it doesn't print everywhere in the console
-		Error.print("These items[^3" .. name .. "^7] ^2Are Registered!^7")
+		Error.print("Callback for item[^3" .. name .. "^7] ^2Registered!^7")
 	end
 end
 

@@ -116,3 +116,11 @@ function Utils.TableRemoveByKey(table, key)
 	table[key] = nil
 	return element
 end
+
+function Utils.GetHashreadableLabel(hash, weaponId)
+	if weaponId > 0 then
+		return DB_Items[hash].label
+	else
+		return Utils.GetWeaponLabel(hash)
+	end
+end
