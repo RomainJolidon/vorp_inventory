@@ -476,16 +476,18 @@ InventoryService.getInventory = function()
 					if weapon.used == 1 then used = true end
 					if weapon.used2 == 1 then used2 = true end
 
-					local newWeapon = Weapon:New({
-						id = weapon.id,
-						propietary = weapon.identifier,
-						name = weapon.name,
-						ammo = weaponAmmo,
-						used = used,
-						used2 = used2,
-						charId = sourceCharId,
-					})
-					UsersWeapons[newWeapon:getId()] = newWeapon
+					if weapon.dropped == 0 then
+						local newWeapon = Weapon:New({
+							id = weapon.id,
+							propietary = weapon.identifier,
+							name = weapon.name,
+							ammo = weaponAmmo,
+							used = used,
+							used2 = used2,
+							charId = sourceCharId,
+						})
+						UsersWeapons[newWeapon:getId()] = newWeapon
+					end
 				end
 				TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 			end
