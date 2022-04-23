@@ -3,7 +3,7 @@ fx_version 'adamant'
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 ui_page 'html/ui.html'
 
-client_scripts{
+client_scripts {
   'client/models/*.lua',
   'client/handler/*.lua',
   'client/services/*.lua',
@@ -25,8 +25,8 @@ shared_scripts {
   "languages/*.lua"
 }
 
-files{
+files {
   'html/**/*'
 }
 
-server_exports{'vorp_inventoryApi'} 
+server_exports { 'vorp_inventoryApi' }
