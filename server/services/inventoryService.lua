@@ -302,8 +302,8 @@ InventoryService.GiveWeapon = function(weaponId, target)
 		local allAmmo = UsersWeapons[weaponId]:getAllAmmo()
 
 		--NOTIFY
-		TriggerClientEvent("vorp:TipRight", _source, _U("yougaveWeapon"), 2000)
-		TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedWeapon"), 2000)
+		TriggerClientEvent("vorp:TipRight", _source, _U("youGaveWeapon"), 2000)
+		TriggerClientEvent("vorp:TipRight", _target, _U("youReceivedWeapon"), 2000)
 
 		TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, propietary, name, allAmmo)
 
@@ -328,7 +328,7 @@ InventoryService.GiveItem = function(itemName, amount, target)
 		TriggerClientEvent("vorp:TipRight", _source, _U("itemerror"), 2000)
 
 		if Config.Debug then
-			Error.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
+			Log.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
 		end
 	end
 
@@ -374,7 +374,7 @@ InventoryService.GiveItem = function(itemName, amount, target)
 			})
 		else
 			if Config.Debug then
-				Error.error("ServerGiveItem: Server items does not contain " .. itemName .. ".")
+				Log.error("ServerGiveItem: Server items does not contain " .. itemName .. ".")
 			end
 			return
 		end

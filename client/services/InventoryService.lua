@@ -5,39 +5,6 @@ UserWeapons = {}
 UserInventory = {}
 bulletsHash = {}
 
--- Probably a Thread -- Test the original version
-InventoryService.updateAmmoInWeapon = function ()
-	Wait(500)
-	local playerPed = PlayerPedId()
-	local weaponHash = 0
-
-	if GetCurrentPedWeapon(playerPed, weaponHash, false, 0, false) then
-		local weaponName = Citizen.InvokeNative(0x89CF5FF3D363311E, weaponHash)
-
-		if string.find(weaponName, "UNARMED") then return end
-
-		local weaponAmmo = {}
-		local currentWeapon = nil
-
-		for _, weapon in pairs(UserWeapons) do
-			if string.find(weaponName, weapon:getName()) and weapon:getUsed() then
-				weaponAmmo = weapon:getAllAmmo()
-				currentWeapon = weapon
-			end
-		end
-
-		if currentWeapon == nil then return end
-
-		for type, amount in pairs(weaponAmmo) do
-			local ammoAmount = Citizen.InvokeNative(0x39D22031557946C1, playerPed, GetHashKey(type))
-
-			if ammoAmount ~= amount then
-				currentWeapon:setAmmo(type, ammoAmount)
-			end
-		end
-	end
-end
-
 InventoryService.receiveItem = function (name, amount)
 	if UserInventory[name] ~= nil then
 		UserInventory[name]:addCount(amount)

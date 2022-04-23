@@ -17,15 +17,17 @@ AddEventHandler('syn:getnuistuff', function(x,y,mon,gol)
     })
 end)
 
-AddEventHandler('onClientResourceStart', function (resourceName) -- TODO remove once dev finished
-    if (GetCurrentResourceName() ~= resourceName) then
-      return
-    end
-    print('loading resource')
-    SetNuiFocus(false, false)
-	SendNUIMessage({action= "hide"})
-	print("Loading Inventory")
-	TriggerServerEvent("vorpinventory:getItemsTable")
-	Wait(300)
-	TriggerServerEvent("vorpinventory:getInventory")
-  end)
+if Config.Debug then
+    AddEventHandler('onClientResourceStart', function (resourceName)
+        if (GetCurrentResourceName() ~= resourceName) then
+          return
+        end
+        print('loading resource')
+        SetNuiFocus(false, false)
+        SendNUIMessage({action= "hide"})
+        print("Loading Inventory")
+        TriggerServerEvent("vorpinventory:getItemsTable")
+        Wait(300)
+        TriggerServerEvent("vorpinventory:getInventory")
+      end)
+end

@@ -52,7 +52,6 @@ end
 ---@param bulletType string
 ---@param qty number
 InventoryApiService.addWeaponBullets = function (weaponId, bulletType, qty)
-    print('add bullets')
     if UserWeapons[weaponId] ~= nil then
         UserWeapons[weaponId]:addAmmo(bulletType, qty)
         if UserWeapons[weaponId]:getUsed() then

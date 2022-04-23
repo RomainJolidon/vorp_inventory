@@ -14,4 +14,6 @@ Locales["de_lang"] = {
     YouReceivedItem   = "Du hast einen Artikel erhalten",
     yougaveitem       = "Du hast einen Artikel verschenkt ",
     itemerror         = "Ungültig ",
+    youReceivedWeapon = "You have received a weapon",
+    yougaveWeapon     = "You have gave a weapon"
 }

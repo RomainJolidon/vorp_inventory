@@ -13,5 +13,7 @@ Locales["pt_lang"] = {
     YouReceived       = "Recebeste %d$ de %s",
     YouReceivedItem   = "Recebeste uma coisa",
     yougaveitem       = "Deste uma coisa",
-    itemerror         = "Invalido "
+    itemerror         = "Invalido ",
+    youReceivedWeapon = "You have received a weapon",
+    yougaveWeapon     = "You have gave a weapon"
 }
