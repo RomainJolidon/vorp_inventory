@@ -69,29 +69,6 @@ InventoryService.setWeaponBullets = function(weaponId, type, amount)
 	end
 end
 
-InventoryService.SaveInventoryItemsSupport = function()
-	local _source = source
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local identifier = sourceCharacter.identifier
-	local charId = sourceCharacter.charIdentifier
-	local characterInventory = {}
-
-	if UsersInventories[identifier] ~= nil then
-		for _, item in pairs(UsersInventories[identifier]) do
-			characterInventory[_] = item
-		end
-
-		if characterInventory ~= nil then
-			exports.ghmattimysql:execute('UPDATE characters SET inventory = @inventory WHERE identifier = @identifier AND charidentifier = @charid', {
-				['inventory'] = json.encode(characterInventory),
-				['identifier'] = identifier,
-				['charidentifier'] = charId
-			}, function()
-			end)
-		end
-	end
-end
-
 InventoryService.usedWeapon = function(id, _used, _used2)
 	local used = 0
 	local used2 = 0
@@ -121,7 +98,7 @@ InventoryService.subItem = function(target, name, amount)
 			if UsersInventories[identifier][name]:getCount() == 0 then
 				UsersInventories[identifier][name] = nil
 			end
-			InventoryService.SaveInventoryItemsSupport()
+			InventoryAPI.SaveInventoryItemsSupport(_source)
 		end
 	end
 end
@@ -135,7 +112,7 @@ InventoryService.addItem = function(target, name, amount)
 		if UsersInventories[identifier][name] ~= nil then
 			if amount > 0 then
 				UsersInventories[identifier][name]:addCount(amount)
-				InventoryService.SaveInventoryItemsSupport()
+				InventoryAPI.SaveInventoryItemsSupport(_source)
 			end
 		else
 			if svItems[name] ~= nil then
@@ -148,7 +125,7 @@ InventoryService.addItem = function(target, name, amount)
 					canUse = svItems[name]:getCanUse(),
 					canRemove = svItems[name]:getCanRemove()
 				})
-				InventoryService.SaveInventoryItemsSupport()
+				InventoryAPI.SaveInventoryItemsSupport(_source)
 			end
 		end
 	end
@@ -476,7 +453,7 @@ InventoryService.getInventory = function()
 					if weapon.used == 1 then used = true end
 					if weapon.used2 == 1 then used2 = true end
 
-					if weapon.dropped == 0 then
+					if weapon.dropped == nil or weapon.dropped == 0 then
 						local newWeapon = Weapon:New({
 							id = weapon.id,
 							propietary = weapon.identifier,

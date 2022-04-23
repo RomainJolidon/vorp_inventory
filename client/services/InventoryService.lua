@@ -130,20 +130,22 @@ InventoryService.getLoadout = function (loadout)
 		if weapon.used == 1 then weaponUsed = true end
 		if weapon.used2 == 1 then weaponUsed2 = true end
 
-		local newWeapon = Weapon:New({
-			id = tonumber(weapon.id),
-			identifier = weapon.identifier,
-			label = Utils.GetWeaponLabel(weapon.name),
-			name = weapon.name,
-			ammo = weaponAmmo,
-			used = weaponUsed,
-			used2 = weaponUsed2
-		})
-
-		UserWeapons[newWeapon:getId()] = newWeapon
-
-		if newWeapon:getUsed() then
-			Utils.useWeapon(newWeapon:getId())
+		if weapon.dropped == nil or weapon.dropped == 0 then
+			local newWeapon = Weapon:New({
+				id = tonumber(weapon.id),
+				identifier = weapon.identifier,
+				label = Utils.GetWeaponLabel(weapon.name),
+				name = weapon.name,
+				ammo = weaponAmmo,
+				used = weaponUsed,
+				used2 = weaponUsed2
+			})
+	
+			UserWeapons[newWeapon:getId()] = newWeapon
+	
+			if newWeapon:getUsed() then
+				Utils.useWeapon(newWeapon:getId())
+			end
 		end
 	end
 end
