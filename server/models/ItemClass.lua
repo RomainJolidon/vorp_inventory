@@ -4,6 +4,7 @@ Item.name = nil
 Item.label = nil
 Item.type = nil
 Item.model = nil
+Item.metadata = {}
 
 Item.count = nil
 Item.limit = nil
@@ -49,6 +50,15 @@ end
 
 function Item:getModel()
 	return self.model
+end
+
+-- Metadata
+function Item:setMedatata(metadata)
+	self.metadata = metadata
+end
+
+function Item:getMedatata()
+	return self.metadata
 end
 
 -- COUNT

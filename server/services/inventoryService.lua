@@ -226,7 +226,7 @@ InventoryService.addItem = function(target, name, amount)
 					limit = svItems[name]:getLimit(),
 					label = svItems[name]:getLabel(),
 					name = name,
-					type = "item_inventory",
+					type = "item_standard",
 					canUse = svItems[name]:getCanUse(),
 					canRemove = svItems[name]:getCanRemove(),
 					desc = svItems[name]:getDesc()
@@ -588,27 +588,37 @@ InventoryService.getInventory = function()
 
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
-	local sourceInventory = json.decode(sourceCharacter.inventory)
 
 	local characterInventory = {}
 
-	if sourceInventory ~= nil then
-		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations STILL TODO?
-			if sourceInventory[item.item] ~= nil then
-				local newItem = Item:New({
-					count = tonumber(sourceInventory[item.item]),
-					limit = item.limit,
-					label = item.label,
-					name = item.item,
-					type = item.type,
-					canUse = item.usable,
-					canRemove = item.can_remove,
-					desc = item.desc,
-				})
-				characterInventory[item.item] = newItem
+	exports.ghmattimysql:execute('SELECT * FROM user_inventories WHERE identifier = @identifier AND charidentifier = @charid', {
+		['identifier'] = sourceIdentifier,
+		['charid'] = sourceCharId,
+	}, function (result)
+		if result ~= nil then
+			local sourceInventory = json.decode(result.items)
+			print(result.items)
+			for _, item in pairs(sourceInventory) do
+				if svItems[item.name] ~= nil then
+					local dbItem = svItems[item.name]
+					local newItem = Item:New({
+						count = tonumber(item.count),
+						limit = dbItem.limit,
+						label = dbItem.label,
+						metadata = item.metadata,
+						name = dbItem.item,
+						type = dbItem.type,
+						canUse = dbItem.usable,
+						canRemove = dbItem.can_remove
+					})
+
+					characterInventory[item.metadata.id] = newItem
+				end
 			end
+			UsersInventories[sourceIdentifier] = characterInventory
+			TriggerClientEvent("vorpInventory:giveInventory", _source, result.items)
 		end
-	end
+	end)
 	UsersInventories[sourceIdentifier] = characterInventory
 
 	TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(sourceInventory))

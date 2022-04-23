@@ -11,7 +11,8 @@ InventoryAPI.SaveInventoryItemsSupport = function(player)
 
 	if (UsersInventories[identifier]) then
 		for _, item in pairs(UsersInventories[identifier]) do
-			items[_] = item:getCount()
+			table.insert(items, {name= item:getName(), amount= item:getCount(), metadata= item:getMetadata()})
+			--items[_] = item:getCount()
 		end
 
 
