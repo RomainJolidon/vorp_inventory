@@ -29,7 +29,8 @@ InventoryAPI.canCarryAmountWeapons = function(player, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
-	local charId = sourceCharacter.charIdentifier
+	local charId = sourceCharacter.charIdentifie
+
 	local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + amount
 
 	if Config.MaxItemsInInventory.Weapons ~= -1 then
@@ -537,7 +538,7 @@ InventoryAPI.subWeapon = function(player, weaponId)
 		UsersWeapons[weaponId]:setPropietary('')
 
 		exports.ghmattimysql:execute("UPDATE loadout SET identifier = @identifier, charidentifier = @charid WHERE id = @id", {
-			['identifier'] = identifier,
+			['identifier'] = '',
 			['charid'] = charId,
 			['id'] = weaponId
 		}, function() end)
