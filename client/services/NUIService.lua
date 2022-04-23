@@ -195,6 +195,7 @@ NUIService.NUIGiveItem = function(obj)
 		if player ~= PlayerId() then
 			if GetPlayerServerId(player) == tonumber(data.player) then
 				local itemName = data2.item
+				local metadata = data2.metadata
 				local target = tonumber(data.player)
 
 				if data2.type == "item_money" then
@@ -207,9 +208,10 @@ NUIService.NUIGiveItem = function(obj)
 					TriggerServerEvent("vorpinventory:giveGoldToPlayer", target, tonumber(data2.count))
 				elseif tonumber(data2.id) == 0 then
 					local amount = tonumber(data2.count)
+					local item =  UserInventory[itemName]:FindByMetadata(metadata)
 
-					if amount > 0 and UserInventory[itemName]:getCount() >= amount then
-						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, 1)
+					if amount > 0 and item ~= nil and item:getCount() >= amount then
+						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, metadata)
 					else
 						-- TODO error message: Invalid amount of item
 					end
@@ -227,6 +229,7 @@ end
 NUIService.NUIDropItem = function(obj)
 	local aux = Utils.expandoProcessing(obj)
 	local itemName = aux.item
+	local metadata = aux.metadata
 	local type = aux.type
 	local qty = tonumber(aux.number)
 
@@ -241,12 +244,15 @@ NUIService.NUIDropItem = function(obj)
 	end
 
 	if type == "item_standard" then
-		if aux.number and aux.number ~= '' then
-			if qty > 0 and UserInventory[itemName]:getCount() >= qty then
+		if aux.number ~= nil and aux.number ~= '' then
+			print(metadata)
+			local item =  UserInventory[itemName]:FindByMetadata(metadata)
+
+			if  qty > 0 and item ~= nil and item:getCount() >= qty then
 				TriggerServerEvent("vorpinventory:serverDropItem", itemName, qty)
-				UserInventory[itemName]:quitCount(qty)
-				if UserInventory[itemName]:getCount() == 0 then
-					UserInventory[itemName] = nil
+				item:quitCount(qty)
+				if item:getCount() == 0 then
+					UserInventory[itemName]:Sub(item)
 				end
 			end
 		end
@@ -388,26 +394,31 @@ NUIService.LoadInv = function()
 	TriggerServerEvent("vorpinventory:check_slots")
 
 
-	for _, currentItem in pairs(UserInventory) do
-		local item = {}
-		item.count = currentItem:getCount()
-		item.limit = currentItem:getLimit()
-		item.label = currentItem:getLabel()
-		item.name = currentItem:getName()
-		item.type = currentItem:getType()
-		item.usable = currentItem:getUsable()
-		item.canRemove = currentItem:getCanRemove()
-		item.desc = currentItem:getDesc()
-
-		table.insert(items, item)
+	for _, itemGroup in pairs(UserInventory) do
+		for _, currentItem in pairs(itemGroup.items) do
+			local item = {}
+			item.count = currentItem:getCount()
+			item.limit = currentItem:getLimit()
+			item.label = currentItem:getLabel()
+			item.name = currentItem:getName()
+			item.metadata = currentItem:getMetadata()
+			item.type = currentItem:getType()
+			item.usable = currentItem:getUsable()
+			item.canRemove = currentItem:getCanRemove()
+			item.desc = currentItem:getDesc()
+			local test = {}
+	
+			table.insert(items, item)
+		end
 	end
 
 	for _, currentWeapon in pairs(UserWeapons) do
 		local weapon = {}
-		weapon.count = currentWeapon:getTotalAmmoCount() -- TODO Replace by number of ammo (all types or one specific tipe ?)
+		weapon.count = currentWeapon:getTotalAmmoCount()
 		weapon.limit = -1
-		weapon.label = currentWeapon:getLabel() -- Citizen.InvokeNative(0x89CF5FF3D363311E, GetHashKey(currentWeapon:getName()))
+		weapon.label = currentWeapon:getLabel()
 		weapon.name = currentWeapon:getName()
+		weapon.metadata = {}
 		weapon.hash = GetHashKey(currentWeapon:getName())
 		weapon.type = "item_weapon"
 		weapon.usable = true

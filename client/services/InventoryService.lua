@@ -5,11 +5,30 @@ UserWeapons = {}
 UserInventory = {}
 bulletsHash = {}
 
-InventoryService.receiveItem = function (name, amount)
+InventoryService.receiveItem = function (name, amount, metadata)
 	if UserInventory[name] ~= nil then
-		UserInventory[name]:addCount(amount)
+		UserInventory[name] = ItemGroup:New(name)
+	end
+	print('metadata:')
+	print(metadata)
+	local item = UserInventory[name]:FindByMetadata(metadata)
+	print('/////')
+	print(UserInventory[name]:FindByMetadata(metadata))
+	print(amount)
+	if item ~= nil then
+		item:addCount(amount)
 		NUIService.LoadInv()
-		return
+	else
+		UserInventory[name]:Add(Item:New({
+			count = amount,
+			limit = DB_Items[name].limit,
+			label = DB_Items[name].name,
+			name = name,
+			metadata = metadata,
+			type = "item_standard",
+			canUse = true,
+			canRemove = DB_Items[name].can_remove
+		}))
 	end
 	
 	UserInventory[name] = Item:New({
@@ -25,15 +44,22 @@ InventoryService.receiveItem = function (name, amount)
 	NUIService.LoadInv()
 end
 
-InventoryService.removeItem = function (name, count)
-	UserInventory[name]:quitCount(count)
-
-	if UserInventory[name]:getCount() <= 0 then
-		--UserInventory[name] = nil
-		Utils.TableRemoveByKey(UserInventory, name)
+InventoryService.removeItem = function (name, count, metadata)
+	if UserInventory[name] == nil then
+		return
 	end
 
-	NUIService.LoadInv()
+	local item = UserInventory[name]:FindByMetadata(metadata)
+
+	if item ~= nil then
+		item:quitCount(count)
+
+		if item:getCount() <= 0 then
+			UserInventory[name]:Sub(item)
+		end
+
+		NUIService.LoadInv()
+	end
 end
 
 InventoryService.receiveWeapon = function (id, propietary, name, ammos)
@@ -127,31 +153,59 @@ InventoryService.getInventory = function (inventory)
 	if inventory ~= '' then
 		local inventoryItems = json.decode(inventory)
 
-		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations
-			local itemName = item.item
-			if inventoryItems[itemName] ~= nil then
-				local itemAmount = tonumber(inventoryItems[itemName])
-				local itemLimit = tonumber(item.limit)
-				local itemLabel = item.label
-				local itemCanRemove = item.can_remove
-				local itemType = item.type
-				local itemCanUse = item.usable
-				local itemDesc = item.desc
+		for _, item in pairs(inventoryItems) do
+			if DB_Items[item.name] ~= nil then
+				local dbItem = DB_Items[item.name]
+				local itemAmount = tonumber(item.count)
+				local itemLimit = tonumber(dbItem.limit)
+				local itemLabel = dbItem.label
+				local itemCanRemove = dbItem.can_remove
+				local itemType = dbItem.type
+				local itemCanUse = dbItem.usable
 
 				local newItem = Item:New({
 					count = itemAmount,
 					limit = itemLimit,
 					label = itemLabel,
-					name = itemName,
+					name = item.name,
+					metadata = item.metadata,
 					type = itemType,
 					canUse = itemCanUse,
 					canRemove = itemCanRemove,
 					desc = itemDesc
 				})
 
-				UserInventory[itemName] = newItem
+				if UserInventory[item.name] == nil then
+					UserInventory[item.name] = ItemGroup:New(item.name)
+				end
+				UserInventory[item.name]:Add(newItem)
 			end
 		end
+
+		-- old code
+		-- for _, item in pairs(DB_Items) do
+		-- 	local itemName = item.item
+		-- 	if inventoryItems[itemName] ~= nil then
+		-- 		local itemAmount = tonumber(inventoryItems[itemName])
+		-- 		local itemLimit = tonumber(item.limit)
+		-- 		local itemLabel = item.label
+		-- 		local itemCanRemove = item.can_remove
+		-- 		local itemType = item.type
+		-- 		local itemCanUse = item.usable
+
+		-- 		local newItem = Item:New({
+		-- 			count = itemAmount,
+		-- 			limit = itemLimit,
+		-- 			label = itemLabel,
+		-- 			name = itemName,
+		-- 			type = itemType,
+		-- 			canUse = itemCanUse,
+		-- 			canRemove = itemCanRemove
+		-- 		})
+
+		-- 		UserInventory[itemName] = newItem
+		-- 	end
+		-- end
 	end
 end
 

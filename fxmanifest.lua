@@ -22,7 +22,8 @@ server_scripts {
 shared_scripts {
   "config.lua",
   "locale.lua",
-  "languages/*.lua"
+  "languages/*.lua",
+  "shared/models/*.lua"
 }
 
 files {

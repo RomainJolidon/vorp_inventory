@@ -28,7 +28,7 @@ PickupsService.CreateObject = function(model, position)
 	return entityHandle
 end
 
-PickupsService.createPickup = function(name, amount, weaponId)
+PickupsService.createPickup = function(name, amount, metadata, weaponId)
 	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed, true, true)
 	local forward = GetEntityForwardVector(playerPed)
@@ -45,7 +45,7 @@ PickupsService.createPickup = function(name, amount, weaponId)
 
 	local entityHandle = PickupsService.CreateObject(pickupModel, position)
 
-	TriggerServerEvent("vorpinventory:sharePickupServer", name, entityHandle, amount, position, weaponId)
+	TriggerServerEvent("vorpinventory:sharePickupServer", name, entityHandle, amount, metadata, position, weaponId)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
 
 end
@@ -90,7 +90,7 @@ PickupsService.createGoldPickup = function(amount)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
 end
 
-PickupsService.sharePickupClient = function(name, entityHandle, amount, position, value, weaponId)
+PickupsService.sharePickupClient = function(name, entityHandle, amount, metadata, position, value, weaponId)
 	if value == 1 then
 		if WorldPickups[entityHandle] == nil then
 			local label = Utils.GetHashreadableLabel(name, weaponId)
@@ -99,6 +99,7 @@ PickupsService.sharePickupClient = function(name, entityHandle, amount, position
 				name = (amount > 1) and label .. " x " .. tostring(amount) or label,
 				entityId = entityHandle,
 				amount = amount,
+				metadata = metadata,
 				weaponId = weaponId,
 				coords = position,
 				prompt = Prompt:New(0xF84FA74F, _U("TakeFromFloor"), PromptType.StandardHold, promptGroup)
@@ -232,18 +233,21 @@ PickupsService.dropAllPlease = function()
 	if Config.DropOnRespawn.Items then
 		local items = UserInventory
 
-		for _, item in pairs(items) do
-			local itemName = item:getName()
-			local itemCount = item:getCount()
-
-			TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount)
-			UserInventory[itemName]:quitCount(itemCount)
-
-			if UserInventory[itemName]:getCount() == 0 then
-				UserInventory[itemName] = nil
+		for _, itemGroup in pairs(items) do
+			for _, item in pairs(itemGroup.items) do
+				local itemName = item:getName()
+				local itemCount = item:getCount()
+				local itemMetadata = item:getMetadata()
+	
+				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount, itemMetadata)
+				item:quitCount(itemCount)
+	
+				if item:getCount() == 0 then
+					UserInventory[itemName]:Sub(item)
+				end
+	
+				Wait(200)
 			end
-
-			Wait(200)
 		end
 	end
 

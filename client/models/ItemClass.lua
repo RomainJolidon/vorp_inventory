@@ -8,6 +8,7 @@ Item.type = nil
 Item.canUse = false
 Item.canRemove = false
 Item.desc = nil
+Item.metadata = {}
 
 
 function Item:setCount(amount)
@@ -36,6 +37,15 @@ end
 
 function Item:getLimit()
 	return self.limit
+end
+
+-- Metadata
+function Item:setMetadata(metadata)
+	self.metadata = metadata
+end
+
+function Item:getMetadata()
+	return self.metadata
 end
 
 function Item:setLabel(label)

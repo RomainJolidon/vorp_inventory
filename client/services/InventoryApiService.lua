@@ -7,21 +7,44 @@ InventoryApiService = {}
 ---@param type string
 ---@param canUse boolean
 ---@param canRemove boolean
----@param desc string
-InventoryApiService.addItem = function (count, limit, label, name, type, canUse, canRemove, desc )
-    if UserInventory[name] ~= nil then
-        UserInventory[name]:addCount(count)
+InventoryApiService.addItem = function (count, limit, label, name, type, canUse, canRemove, desc, metadata)
+    if UserInventory[name] == nil then
+        UserInventory[name] = ItemGroup:New(name)
+    end
+    local item = UserInventory[name]:FindByMetadata(metadata)
+
+    if item ~= nil then
+        item:addCount(count)
     else
-        UserInventory[name] = Item:New({
+        UserInventory[name]:Add(Item:New({
             count = count,
             limit = limit,
             name = name,
             label = label,
+            metadata = metadata,
             type = type,
             canUse = canUse,
             canRemove = canRemove,
             desc = desc
-        })
+        }))
+    end
+    NUIService.LoadInv()
+end
+
+---@param name string
+---@param qty number
+---@param metadata table
+InventoryApiService.subItem = function (name, qty, metadata)
+    if UserInventory[name] == nil then
+        return
+    end
+
+    local item = UserInventory[name]:FindByMetadata(metadata)
+    if item ~= nil then
+        item:setCount(qty)
+        if item:getCount() == 0 then
+            UserInventory[name]:Sub(item)
+        end
     end
     NUIService.LoadInv()
 end
@@ -33,19 +56,6 @@ InventoryApiService.subWeapon = function (weaponId)
             RemoveWeaponFromPed(PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()),true, 0)
         end
         Utils.TableRemoveByKey(UserWeapons, weaponId)
-    end
-    NUIService.LoadInv()
-end
-
----@param name string
----@param qty number
-InventoryApiService.subItem = function (name, qty)
-    if UserInventory[name] ~= nil then
-        UserInventory[name]:setCount(qty)
-        if UserInventory[name]:getCount() == 0 then
-            --table.remove(UserInventory, name)
-            Utils.TableRemoveByKey(UserInventory, name)
-        end
     end
     NUIService.LoadInv()
 end

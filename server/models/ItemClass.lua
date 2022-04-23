@@ -53,11 +53,11 @@ function Item:getModel()
 end
 
 -- Metadata
-function Item:setMedatata(metadata)
+function Item:setMetadata(metadata)
 	self.metadata = metadata
 end
 
-function Item:getMedatata()
+function Item:getMetadata()
 	return self.metadata
 end
 
