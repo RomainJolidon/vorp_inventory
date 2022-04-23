@@ -4,7 +4,7 @@
 
 Config  = {
 
-  Debug = true,
+  Debug = true, -- if your server is live set this to false.  to true only if you are testing things
   
   defaultlang = "en_lang",
 
