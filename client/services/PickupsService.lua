@@ -96,6 +96,7 @@ PickupsService.sharePickupClient = function (name, entityHandle, amount, positio
 		end
 	else
 		-- WorldPickups[obj] = nil
+		WorldPickups[entityHandle].prompt:Delete()
 		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end
@@ -120,6 +121,7 @@ PickupsService.shareMoneyPickupClient = function (entityHandle, amount, position
 		end
 	else
 		-- WorldPickups[obj] = nil
+		WorldPickups[entityHandle].prompt:Delete()
 		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end
@@ -253,7 +255,8 @@ PickupsService.OnWorldPickup = function()
 					TriggerServerEvent("vorpinventory:onPickup", pickup.entityId)
 				end
 
-				pickup.prompt:Delete()
+				Wait(1000)
+				--pickup.prompt:Delete()
 			end
 		else
 			if pickup.prompt:GetEnabled() then

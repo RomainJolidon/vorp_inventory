@@ -484,11 +484,11 @@ InventoryAPI.giveWeapon = function(player, weaponId, target)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
-	local _target = target
+	local _target = tonumber(target)
 	local targetisPlayer = false
 
 	for _, pl in pairs(GetPlayers()) do
-		if pl == _target then
+		if tonumber(pl) == _target then
 			targetisPlayer = true
 			break
 		end

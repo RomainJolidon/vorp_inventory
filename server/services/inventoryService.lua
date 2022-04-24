@@ -185,7 +185,7 @@ InventoryService.onPickup = function(obj)
 						local totalAmount = amount + sourceItemCount
 
 						if svItems[name]:getLimit() < totalAmount then
-							TriggerClientEvent(_source, "vorp:TipRight", _U("fullInventory"), 2000)
+							TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
 							return
 						end
 					end
@@ -212,8 +212,7 @@ InventoryService.onPickup = function(obj)
 			end
 		else
 			if Config.MaxItemsInInventory.Weapons ~= 0 then
-				local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId)
-				sourceInventoryWeaponCount = sourceInventoryWeaponCount + 1
+				local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + 1
 
 				if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.Weapons then
 					local weaponId = ItemPickUps[obj].weaponid
@@ -226,6 +225,8 @@ InventoryService.onPickup = function(obj)
 					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
 					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
 					ItemPickUps[obj] = nil
+				else
+					TriggerClientEvent("vorp:TipRight", _source,  _U("fullInventoryWeapon"), 2000)
 				end
 			end
 		end
