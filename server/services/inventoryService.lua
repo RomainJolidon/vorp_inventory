@@ -344,7 +344,7 @@ InventoryService.GiveItem = function(itemName, amount, target)
 		targetItemAmount = targetItem:getCount()
 		targetItemLimit = targetItem:getLimit()
 
-		if targetItemAmount + amount >= targetItemLimit then
+		if targetItemAmount + amount > targetItemLimit then
 			canGiveItemToTarget = false
 		end
 	end
