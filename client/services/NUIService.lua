@@ -192,31 +192,31 @@ NUIService.NUIGiveItem = function (obj)
 	local data2 = Utils.expandoProcessing(data.data)
 
 	for _, player in pairs(nearestPlayers) do
-		--if player ~= PlayerId() then
-		if GetPlayerServerId(player) == tonumber(data.player) then
-			local itemName = data2.item
-			local target = tonumber(data.player)
+		if player ~= PlayerId() then
+			if GetPlayerServerId(player) == tonumber(data.player) then
+				local itemName = data2.item
+				local target = tonumber(data.player)
 
-			if data2.type == "item_money" then
-				if isProcessingPay then return end
-				isProcessingPay = true
-				TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, tonumber(data2.count))
-			elseif tonumber(data2.id) == 0 then
-				local amount = tonumber(data2.count)
+				if data2.type == "item_money" then
+					if isProcessingPay then return end
+					isProcessingPay = true
+					TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, tonumber(data2.count))
+				elseif tonumber(data2.id) == 0 then
+					local amount = tonumber(data2.count)
 
-				if amount > 0 and UserInventory[itemName]:getCount() >= amount then
-					TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, 1)
+					if amount > 0 and UserInventory[itemName]:getCount() >= amount then
+						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, 1)
+					else
+						-- TODO error message: Invalid amount of item
+					end
 				else
-					-- TODO error message: Invalid amount of item
+					TriggerServerEvent("vorpinventory:serverGiveWeapon", tonumber(data2.id), target)
+					TriggerServerEvent("vorpinventory:weaponlog", target, data2)
 				end
-			else
-				TriggerServerEvent("vorpinventory:serverGiveWeapon", tonumber(data2.id), target)
-				TriggerServerEvent("vorpinventory:weaponlog", target, data2)
-			end
 
-			NUIService.LoadInv()
+				NUIService.LoadInv()
+			end
 		end
-		--end
 	end
 end
 

@@ -90,14 +90,14 @@ Utils.getNearestPlayers = function()
 	for _, player in pairs(GetActivePlayers()) do
 		local target = GetPlayerPed(player)
 
-		--if target ~= playerPed then
-		local targetCoords = GetEntityCoords(target, true, true)
-		local distance = #(targetCoords - coords)
+		if target ~= playerPed then
+			local targetCoords = GetEntityCoords(target, true, true)
+			local distance = #(targetCoords - coords)
 
-		if distance < closestDistance then
-			table.insert(closestPlayers, player)
+			if distance < closestDistance then
+				table.insert(closestPlayers, player)
+			end
 		end
-		--end
 	end
 	return closestPlayers
 end
