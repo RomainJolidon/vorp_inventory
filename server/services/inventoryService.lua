@@ -294,19 +294,7 @@ InventoryService.GiveWeapon = function(weaponId, target)
 	local _target = target
 
 	if UsersWeapons[weaponId] ~= nil then
-		InventoryService.subWeapon(_source, weaponId)
-		InventoryService.addWeapon(_target, weaponId)
-
-		local propietary = UsersWeapons[weaponId]:getPropietary()
-		local name = UsersWeapons[weaponId]:getName()
-		local allAmmo = UsersWeapons[weaponId]:getAllAmmo()
-
-		--NOTIFY
-		TriggerClientEvent("vorp:TipRight", _source, _U("youGaveWeapon"), 2000)
-		TriggerClientEvent("vorp:TipRight", _target, _U("youReceivedWeapon"), 2000)
-
-		TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, propietary, name, allAmmo)
-
+		InventoryAPI.giveWeapon(_target, weaponId, _source)
 	end
 end
 
