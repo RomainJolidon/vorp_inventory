@@ -381,9 +381,13 @@ InventoryService.GiveItem = function(itemName, amount, target)
 	TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, amount)
 	TriggerClientEvent("vorpInventory:removeItem", _source, itemName, amount)
 
+	
+	
+       local ItemsLabel = svItems[itemName]:getLabel()
 	--NOTIFY
-	TriggerClientEvent("vorp:TipRight", _source, _U("yougaveitem"), 2000)
-	TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedItem"), 2000)
+	
+	TriggerClientEvent("vorp:TipRight", _source, "you gave " .. amount .. " of " .. ItemsLabel .. "", 2000)
+	TriggerClientEvent("vorp:TipRight", _target, "you gave " .. amount .. " of " .. ItemsLabel .. "", 2000)
 	TriggerEvent("vorpinventory:itemlog", _source, _target, itemName, amount)
 end
 
