@@ -69,9 +69,9 @@ AddEventHandler("vorp_inventory:OpenHideoutInventory", NUIService.OpenHideoutInv
 RegisterNetEvent("vorp_inventory:ReloadHideoutInventory")
 AddEventHandler("vorp_inventory:ReloadHideoutInventory", NUIService.ReloadInventory)
 
-RegisterNuiCallbackType("TakeFromHideout", NUIService.NUITakeFromHideout)
+RegisterNUICallback("TakeFromHideout", NUIService.NUITakeFromHideout)
 
-RegisterNuiCallbackType("MoveToHideout", NUIService.NUIMoveToHideout)
+RegisterNUICallback("MoveToHideout", NUIService.NUIMoveToHideout)
 
 -- Clan Module
 RegisterNetEvent("vorp_inventory:OpenClanInventory")
@@ -80,9 +80,9 @@ AddEventHandler("vorp_inventory:OpenClanInventory", NUIService.OpenClanInventory
 RegisterNetEvent("vorp_inventory:ReloadClanInventory")
 AddEventHandler("vorp_inventory:ReloadClanInventory", NUIService.ReloadInventory)
 
-RegisterNuiCallbackType("TakeFromClan", NUIService.NUITakeFromClan)
+RegisterNUICallback("TakeFromClan", NUIService.NUITakeFromClan)
 
-RegisterNuiCallbackType("MoveToClan", NUIService.NUIMoveToClan)
+RegisterNUICallback("MoveToClan", NUIService.NUIMoveToClan)
 
 -- Container Module
 RegisterNetEvent("vorp_inventory:OpenContainerInventory")
@@ -91,6 +91,6 @@ AddEventHandler("vorp_inventory:OpenContainerInventory", NUIService.OpenContaine
 RegisterNetEvent("vorp_inventory:ReloadContainerInventory")
 AddEventHandler("vorp_inventory:ReloadContainerInventory", NUIService.ReloadInventory)
 
-RegisterNuiCallbackType("TakeFromContainer", NUIService.NUITakeFromContainer);
+RegisterNUICallback("TakeFromContainer", NUIService.NUITakeFromContainer);
 
-RegisterNuiCallbackType("MoveToContainer", NUIService.NUIMoveToContainer);
+RegisterNUICallback("MoveToContainer", NUIService.NUIMoveToContainer);

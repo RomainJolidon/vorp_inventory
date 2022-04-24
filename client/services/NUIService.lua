@@ -24,6 +24,12 @@ NUIService.NUITakeFromClan = function (obj)
 	TriggerServerEvent("syn_clan:TakeFromClan", json.encode(obj))
 end
 
+NUIService.OpenContainerInventory = function (ContainerName, Containerid)
+	SetNuiFocus(true, true)
+	SendNUIMessage({action= "display", type= "Container", title= "" .. ContainerName .. "", Containerid= Containerid})
+	InInventory = true
+end
+
 NUIService.NUIMoveToContainer = function (obj)
 	TriggerServerEvent("syn_Container:MoveToContainer", json.encode(obj))
 end
@@ -54,7 +60,7 @@ NUIService.NUITakeFromHorse = function (obj)
 end
 
 NUIService.OpenstealInventory = function (stealName, stealId)
-	SetNuiFocus(false, false)
+	SetNuiFocus(true, true)
 	SendNUIMessage({action= "display", type=  "steal", title= stealName, stealId= stealId})
 	InInventory = true
 	TriggerEvent("vorp_stables:setClosedInv", true)
