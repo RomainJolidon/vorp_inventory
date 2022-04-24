@@ -196,7 +196,7 @@ InventoryService.onPickup = function(obj)
 					sourceInventoryItemCount = sourceInventoryItemCount + amount
 
 					if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
-						TriggerClientEvent("vorp:TipRight", _source, _U(fullInventory), 2000)
+						TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
 						return
 					end
 				end
