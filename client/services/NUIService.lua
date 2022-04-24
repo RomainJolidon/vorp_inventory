@@ -226,7 +226,7 @@ NUIService.NUIGiveItem = function(obj)
 	end
 end
 
-NUIService.NUIDropItem = function(obj)
+NUIService.NUIDropItem = function (obj)
 	local aux = Utils.expandoProcessing(obj)
 	local itemName = aux.item
 	local metadata = aux.metadata
@@ -245,7 +245,6 @@ NUIService.NUIDropItem = function(obj)
 
 	if type == "item_standard" then
 		if aux.number ~= nil and aux.number ~= '' then
-			print(metadata)
 			local item =  UserInventory[itemName]:FindByMetadata(metadata)
 
 			if  qty > 0 and item ~= nil and item:getCount() >= qty then

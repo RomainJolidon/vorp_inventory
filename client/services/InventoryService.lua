@@ -6,18 +6,12 @@ UserInventory = {}
 bulletsHash = {}
 
 InventoryService.receiveItem = function (name, amount, metadata)
-	if UserInventory[name] ~= nil then
+	if UserInventory[name] == nil then
 		UserInventory[name] = ItemGroup:New(name)
 	end
-	print('metadata:')
-	print(metadata)
 	local item = UserInventory[name]:FindByMetadata(metadata)
-	print('/////')
-	print(UserInventory[name]:FindByMetadata(metadata))
-	print(amount)
 	if item ~= nil then
 		item:addCount(amount)
-		NUIService.LoadInv()
 	else
 		UserInventory[name]:Add(Item:New({
 			count = amount,
