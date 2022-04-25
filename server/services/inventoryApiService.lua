@@ -205,7 +205,7 @@ end
 
 InventoryAPI.getUserWeapons = function(player, cb)
 	local _source = player
-	local sourceCharacter = core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charidentifier = sourceCharacter.charIdentifier
 
