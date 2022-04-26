@@ -5,6 +5,7 @@
 Config  = {
 
   Debug = true, -- if your server is live set this to false.  to true only if you are testing things
+  DevMode = false, -- if your server is live set this to false.  to true only if you are testing things (auto load inventory on player login and add /getInv command)
   
   defaultlang = "en_lang",
 
