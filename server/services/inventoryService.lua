@@ -428,44 +428,43 @@ InventoryService.getInventory = function()
 				characterInventory[item.item] = newItem
 			end
 		end
-	end
-	UsersInventories[sourceIdentifier] = characterInventory
-
-	TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(sourceInventory))
-
-	exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', {
-		['identifier'] = sourceIdentifier,
-		['charid'] = sourceCharId,
-	},
-		function(result)
-			if result ~= nil then
-				for _, weapon in pairs(result) do
-					local db_Ammo = json.decode(weapon.ammo)
-					local weaponAmmo = {}
-					local used = false
-					local used2 = false
-
-					for _, ammo in pairs(db_Ammo) do
-						weaponAmmo[_] = ammo
+		UsersInventories[sourceIdentifier] = characterInventory
+	
+		TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(sourceInventory))
+		exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', {
+			['identifier'] = sourceIdentifier,
+			['charid'] = sourceCharId,
+		},
+			function(result)
+				if result ~= nil then
+					for _, weapon in pairs(result) do
+						local db_Ammo = json.decode(weapon.ammo)
+						local weaponAmmo = {}
+						local used = false
+						local used2 = false
+	
+						for _, ammo in pairs(db_Ammo) do
+							weaponAmmo[_] = ammo
+						end
+	
+						if weapon.used == 1 then used = true end
+						if weapon.used2 == 1 then used2 = true end
+	
+						if weapon.dropped == nil or weapon.dropped == 0 then
+							local newWeapon = Weapon:New({
+								id = weapon.id,
+								propietary = weapon.identifier,
+								name = weapon.name,
+								ammo = weaponAmmo,
+								used = used,
+								used2 = used2,
+								charId = sourceCharId,
+							})
+							UsersWeapons[newWeapon:getId()] = newWeapon
+						end
 					end
-
-					if weapon.used == 1 then used = true end
-					if weapon.used2 == 1 then used2 = true end
-
-					if weapon.dropped == nil or weapon.dropped == 0 then
-						local newWeapon = Weapon:New({
-							id = weapon.id,
-							propietary = weapon.identifier,
-							name = weapon.name,
-							ammo = weaponAmmo,
-							used = used,
-							used2 = used2,
-							charId = sourceCharId,
-						})
-						UsersWeapons[newWeapon:getId()] = newWeapon
-					end
+					TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 				end
-				TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
-			end
-		end)
+			end)
+	end
 end
