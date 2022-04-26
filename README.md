@@ -1,5 +1,5 @@
 # Inventory System for VORP Core (made in Lua)
-> :warning: This is Work In Progress ! Some functionnalities are not implemented yet
+> :warning: This is in test phase. If you find some bug, Contact the vorp team on Discord
 
 ## Requirements
 - [VORP Core](https://github.com/VORPCORE/VORP-Core/releases)
@@ -16,7 +16,7 @@
 ## Features
 * Unique weapons in order not to duplicate them.
 * Each weapon has its own ammo and can have diferent type of ammo.
-* Each weapon has its own modifications. (:warning: Not implemented yet)
+* Each weapon has its own modifications.
 * When dropping or giving a weapon you give it with all the modifications and ammo.
 * It also has usable items.
 * KLS.
