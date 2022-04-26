@@ -96,7 +96,9 @@ PickupsService.sharePickupClient = function (name, entityHandle, amount, positio
 		end
 	else
 		-- WorldPickups[obj] = nil
-		WorldPickups[entityHandle].prompt:Delete()
+		if WorldPickups[entityHandle] ~= nil then
+			WorldPickups[entityHandle].prompt:Delete()
+		end
 		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end
@@ -121,7 +123,9 @@ PickupsService.shareMoneyPickupClient = function (entityHandle, amount, position
 		end
 	else
 		-- WorldPickups[obj] = nil
-		WorldPickups[entityHandle].prompt:Delete()
+		if WorldPickups[entityHandle] ~= nil then
+			WorldPickups[entityHandle].prompt:Delete()
+		end
 		Utils.TableRemoveByKey(WorldPickups, entityHandle)
 	end
 end

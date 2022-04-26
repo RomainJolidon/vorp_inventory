@@ -119,7 +119,10 @@ end
 
 function Utils.GetHashreadableLabel(hash, weaponId)
 	if weaponId <= 1 then
-		return DB_Items[hash].label
+		if DB_Items[hash] ~= nil then
+			return DB_Items[hash].label
+		end
+		return hash
 	else
 		return Utils.GetWeaponLabel(hash)
 	end
