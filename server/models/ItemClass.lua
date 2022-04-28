@@ -1,10 +1,12 @@
 Item = {}
 
+Item.id = nil
 Item.name = nil
 Item.label = nil
 Item.type = nil
 Item.model = nil
 Item.metadata = {}
+Item.createdAt = nil
 
 Item.count = nil
 Item.limit = nil

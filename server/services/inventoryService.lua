@@ -642,6 +642,40 @@ InventoryService.getInventory = function()
 
 	local characterInventory = {}
 
+	exports.ghmattimysql:execute("SELECT ic.id, i.item, ci.amount, ic.metadata, ci.created_at FROM items_crafted ic\
+	LEFT JOIN character_inventories ci on ic.id = ci.item_crafted_id\
+    LEFT JOIN items i on ic.item_id = i.id\
+    WHERE ci.inventory_type = 'default'\
+      AND ci.character_id = @charid;", {
+		['charid'] = sourceCharId
+	}, function (result)
+		if result ~= nil then
+			for _, item in pairs(result) do
+				if svItems[item.item] ~= nil then
+					local dbItem = svItems[item.item]
+					local newItem = Item:New({
+						count = tonumber(item.amount),
+						id = item.id,
+						limit = dbItem.limit,
+						label = dbItem.label,
+						metadata = item.metadata,
+						name = dbItem.item,
+						type = dbItem.type,
+						canUse = dbItem.usable,
+						canRemove = dbItem.can_remove,
+						createdAt = item.created_at
+					})
+
+					if characterInventory[item.item] == nil then
+						characterInventory[item.item] = ItemGroup:New(item.item)
+					end
+					characterInventory[item.item]:Add(newItem)
+				end
+			end
+		end
+	end)
+
+	-- old code
 	exports.ghmattimysql:execute('SELECT * FROM user_inventories WHERE identifier = @identifier AND charidentifier = @charid', {
 		['identifier'] = sourceIdentifier,
 		['charid'] = sourceCharId,

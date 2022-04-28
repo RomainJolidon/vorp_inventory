@@ -9,6 +9,7 @@ local LoadDatabase = function ()
 			DB_Items = result
 			for _, db_item in pairs(result) do
 				local item = Item:New({
+					id = db_item.id,
 					item = db_item.item,
 					label = db_item.label,
 					limit = db_item.limit,
