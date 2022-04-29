@@ -312,6 +312,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	local charIdentifier = sourceCharacter.charIdentifier
 
 	if svItems[name] == nil then
 		if Config.Debug then
@@ -344,7 +345,9 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 		if UsersInventories[identifier][name]:GetCount() + amount <= sourceItemLimit or sourceItemLimit == -1 then
 			local item = UsersInventories[identifier][name]:FindByMetadata(metadata)
 			if item == nil then
+				local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
 				item = Item:New({
+					id = dbCraftedItem.id,
 					count = amount,
 					limit = sourceItemLimit,
 					label = itemLabel,
@@ -355,15 +358,18 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					canRemove = itemCanRemove
 				})
 				UsersInventories[identifier][name]:Add(item)
-			end
-			if Config.MaxItemsInInventory.Items ~= -1 then
-				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+			else
+				if Config.MaxItemsInInventory.Items ~= -1 then
+					if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+						item:addCount(amount)
+						DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
+						added = true
+					end
+				else
 					item:addCount(amount)
+					DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 					added = true
 				end
-			else
-				item:addCount(amount)
-				added = true
 			end
 		end
 	else
@@ -377,7 +383,9 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 
 			if Config.MaxItemsInInventory.Items ~= -1 then
 				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+					local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
 					UsersInventories[identifier][name]:Add(Item:New({
+						id = dbCraftedItem.id,
 						count = amount,
 						limit = sourceItemLimit,
 						label = itemLabel,
@@ -391,7 +399,9 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					added = true
 				end
 			else
+				local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
 				UsersInventories[identifier][name]:Add(Item:New({
+					id = dbCraftedItem.id,
 					count = amount,
 					limit = sourceItemLimit,
 					label = itemLabel,
@@ -419,7 +429,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 		local itemDesc = UsersInventories[identifier][name]:getDesc()
 
 		TriggerClientEvent("vorpCoreClient:addItem", _source, amount, itemLimit, itemLabel, name, itemType, itemUsable, itemCanRemove, itemMetadata)
-		InventoryAPI.SaveInventoryItemsSupport(_source)
+		--InventoryAPI.SaveInventoryItemsSupport(_source)
 	else
 		TriggerClientEvent("vorp:Tip", _source, _U("fullInventory"), 2000)
 	end

@@ -148,20 +148,24 @@ InventoryService.getInventory = function (inventory)
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do
-			if DB_Items[item.name] ~= nil then
-				local dbItem = DB_Items[item.name]
-				local itemAmount = tonumber(item.count)
+			print(json.encode(item))
+			if DB_Items[item.item] ~= nil then
+				local dbItem = DB_Items[item.item]
+				local itemAmount = tonumber(item.amount)
 				local itemLimit = tonumber(dbItem.limit)
+				local itemCreatedAt = item.created_at
 				local itemLabel = dbItem.label
 				local itemCanRemove = dbItem.can_remove
 				local itemType = dbItem.type
 				local itemCanUse = dbItem.usable
+				local itemDesc = dbItem.desc
 
 				local newItem = Item:New({
+					id = item.id,
 					count = itemAmount,
 					limit = itemLimit,
 					label = itemLabel,
-					name = item.name,
+					name = item.item,
 					metadata = item.metadata,
 					type = itemType,
 					canUse = itemCanUse,
@@ -169,37 +173,12 @@ InventoryService.getInventory = function (inventory)
 					desc = itemDesc
 				})
 
-				if UserInventory[item.name] == nil then
-					UserInventory[item.name] = ItemGroup:New(item.name)
+				if UserInventory[item.item] == nil then
+					UserInventory[item.item] = ItemGroup:New(item.item)
 				end
-				UserInventory[item.name]:Add(newItem)
+				UserInventory[item.item]:Add(newItem)
 			end
 		end
-
-		-- old code
-		-- for _, item in pairs(DB_Items) do
-		-- 	local itemName = item.item
-		-- 	if inventoryItems[itemName] ~= nil then
-		-- 		local itemAmount = tonumber(inventoryItems[itemName])
-		-- 		local itemLimit = tonumber(item.limit)
-		-- 		local itemLabel = item.label
-		-- 		local itemCanRemove = item.can_remove
-		-- 		local itemType = item.type
-		-- 		local itemCanUse = item.usable
-
-		-- 		local newItem = Item:New({
-		-- 			count = itemAmount,
-		-- 			limit = itemLimit,
-		-- 			label = itemLabel,
-		-- 			name = itemName,
-		-- 			type = itemType,
-		-- 			canUse = itemCanUse,
-		-- 			canRemove = itemCanRemove
-		-- 		})
-
-		-- 		UserInventory[itemName] = newItem
-		-- 	end
-		-- end
 	end
 end
 

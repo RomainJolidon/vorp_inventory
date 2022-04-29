@@ -18,6 +18,15 @@ Item.canRemove = false
 Item.desc = nil
 Item.dropOnDeath = false 
 
+-- ID
+function Item:setId(id) 
+	self.id = id
+end
+
+function Item:getId() 
+	return self.id
+end
+
 -- NAME
 function Item:setName(name) 
 	self.name = name
@@ -28,20 +37,20 @@ function Item:getName()
 end
 
 -- LABEL
-function Item:setLabel(label) 
+function Item:setLabel(label)
 	self.label = label
 end
 
-function Item:getLabel() 
+function Item:getLabel()
 	return self.label
 end
 
 -- TYPE
-function Item:setType(type) 
+function Item:setType(type)
 	self.type = type
 end
 
-function Item:getType() 
+function Item:getType()
 	return self.type
 end
 
@@ -64,15 +73,15 @@ function Item:getMetadata()
 end
 
 -- COUNT
-function Item:setCount(amount) 
+function Item:setCount(amount)
 	self.count = amount
 end
 
-function Item:getCount() 
+function Item:getCount()
 	return self.count
 end
 
-function Item:addCount(amount) 
+function Item:addCount(amount)
 	if self.count + amount <= self.limit then
 		self.count = self.count + amount
 		return true

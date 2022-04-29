@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `items_crafted` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `character_inventories` (
-  `character_id` int(11) NOT NULL REFERENCES characters(charidentifier),
+  `character_id` int(11) DEFAULT NULL REFERENCES characters(charidentifier),
   `inventory_type` ENUM('default', 'horse', 'cart', 'hideout', 'container', 'clan') NOT NULL DEFAULT 'default',
   `item_crafted_id` int(11) NOT NULL REFERENCES items_crafted(id),
   `amount` int(11) DEFAULT NULL,

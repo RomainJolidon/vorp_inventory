@@ -229,6 +229,7 @@ end
 NUIService.NUIDropItem = function (obj)
 	local aux = Utils.expandoProcessing(obj)
 	local itemName = aux.item
+	local itemId = aux.id
 	local metadata = aux.metadata
 	local type = aux.type
 	local qty = tonumber(aux.number)
@@ -245,10 +246,10 @@ NUIService.NUIDropItem = function (obj)
 
 	if type == "item_standard" then
 		if aux.number ~= nil and aux.number ~= '' then
-			local item =  UserInventory[itemName]:FindByMetadata(metadata)
+			local item =  UserInventory[itemName]:FindById(itemId)
 
 			if  qty > 0 and item ~= nil and item:getCount() >= qty then
-				TriggerServerEvent("vorpinventory:serverDropItem", itemName, qty)
+				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata)
 				item:quitCount(qty)
 				if item:getCount() == 0 then
 					UserInventory[itemName]:Sub(item)
@@ -402,10 +403,10 @@ NUIService.LoadInv = function()
 			item.name = currentItem:getName()
 			item.metadata = currentItem:getMetadata()
 			item.type = currentItem:getType()
-			item.usable = currentItem:getUsable()
+			item.usable = currentItem:getCanUse()
 			item.canRemove = currentItem:getCanRemove()
 			item.desc = currentItem:getDesc()
-			local test = {}
+			item.id = currentItem:getId()
 	
 			table.insert(items, item)
 		end

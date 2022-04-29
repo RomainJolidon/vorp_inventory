@@ -3,15 +3,22 @@ ItemGroup = {}
 ItemGroup.items = {}
 ItemGroup.name = {}
 
-function ItemGroup:FindByMetadata(metadata)
-    local foundItem = nil
+function ItemGroup:FindById(id)
     for _, item in pairs(self.items) do
-        if Table_equals(metadata, item.metadata) then
-            foundItem = item
-            break
+        if item.id == id then
+            return item
         end
     end
-    return foundItem
+    return nil
+end
+
+function ItemGroup:FindByMetadata(metadata)
+    for _, item in pairs(self.items) do
+        if Table_equals(metadata, item.metadata) then
+            return item
+        end
+    end
+    return nil
 end
 
 function ItemGroup:FindIdxByMetadata(metadata)
@@ -72,7 +79,7 @@ function Table_equals(o1, o2, ignore_mt)
 
     for key1, value1 in pairs(o1) do
         local value2 = o2[key1]
-        if value2 == nil or equals(value1, value2, ignore_mt) == false then
+        if value2 == nil or Table_equals(value1, value2, ignore_mt) == false then
             return false
         end
         keySet[key1] = true
