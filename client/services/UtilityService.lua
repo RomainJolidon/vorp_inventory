@@ -1,5 +1,18 @@
 Utils = {}
 
+Utils.FindItemByNameAndMetadata = function (identifier, name, metadata)
+    if UserInventory == nil then
+        return nil
+    end
+    
+    for _, item in pairs(UserInventory) do
+        if name == item:getName() and SharedUtils.Table_equals(metadata, item:getMetadata()) then
+            return item
+        end
+    end
+    return nil
+end
+
 Utils.cleanAmmo = function(id)
 	if next(UserWeapons[id]) ~= nil then
 		SetPedAmmo(PlayerPedId(), GetHashKey(UserWeapons[id]:getName()), 0)
@@ -45,12 +58,14 @@ Utils.oldUseWeapon = function(id)
 	TriggerServerEvent("vorpinventory:setUsedWeapon", id, UserWeapons[id]:getUsed(), UserWeapons[id]:getUsed2())
 end
 
-Utils.addItems = function(name, amount)
-	if next(UserInventory[name]) ~= nil then
-		UserInventory[name]:addCount(amount)
+Utils.addItems = function(name, id, amount)
+	if next(UserInventory[id]) ~= nil then
+		UserInventory[id]:addCount(amount)
 	else
-		UserInventory[name] = Item:New({
+		UserInventory[id] = Item:New({
+			id = id,
 			count = amount,
+			name = name,
 			limit = DB_Items[name].limit,
 			label = DB_Items[name].label,
 			type = "item_standard",

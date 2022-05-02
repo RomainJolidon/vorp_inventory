@@ -55,32 +55,32 @@ DbService.DeleteItem = function (itemCraftedId)
     end)
 end
 
-DbService.CreateItem = function(sourceCharIdentifier, itemId, amount, metadata)
-    local item = {}
+DbService.CreateItem = function(sourceCharIdentifier, itemId, amount, metadata, cb)
     Log.print('Create Item')
     exports.ghmattimysql:execute("INSERT INTO items_crafted (character_id, item_id, metadata) VALUES (@charid, @itemid, @metadata);", {
         ['charid'] = tonumber(sourceCharIdentifier),
         ['itemid'] = tonumber(itemId),
-        ['metadata'] = metadata -- Check if need to json.encode().
-    })
+        ['metadata'] = json.encode(metadata) -- Check if need to json.encode().
+    }, function ()
+        -- Can it be replaced with mysql_insert_id() ?
+        exports.ghmattimysql:execute("SELECT * FROM items_crafted WHERE character_id = @charid AND item_id = @itemid AND JSON_CONTAINS(metadata, @metadata);", {
+            ['charid'] = tonumber(sourceCharIdentifier),
+            ['itemid'] = tonumber(itemId),
+            ['metadata'] = json.encode(metadata) -- Check if need to json.encode().
+        }, function (result)
+            if result ~= nil and result[1] ~= nil then
+                local item = result[1]
+                local itemCraftedId = item.id
+                print('inserting into character_inventories')
     
-    -- Can it be replaced with mysql_insert_id() ?
-    exports.ghmattimysql:execute("SELECT * FROM items_crafted WHERE character_id = @charid AND item_id = @itemid AND JSON_CONTAINS(metadata, @metadata);", {
-        ['charid'] = tonumber(sourceCharIdentifier),
-        ['itemid'] = tonumber(itemId),
-        ['metadata'] = metadata -- Check if need to json.encode().
-    }, function (result)
-        if result ~= nil then
-            item.id = result.id
-            item.metadata = result.metadata
-            local itemCraftedId = result.id
-
-            exports.ghmattimysql:execute("INSERT INTO character_inventories (character_id, item_crafted_id, amount) VALUES (@charid, @itemid, @amount);", {
-                ['charid'] = tonumber(sourceCharIdentifier),
-                ['itemid'] = tonumber(itemCraftedId),
-                ['amount'] = tonumber(amount)
-            })
-        end
+                exports.ghmattimysql:execute("INSERT INTO character_inventories (character_id, item_crafted_id, amount) VALUES (@charid, @itemid, @amount);", {
+                    ['charid'] = tonumber(sourceCharIdentifier),
+                    ['itemid'] = tonumber(itemCraftedId),
+                    ['amount'] = tonumber(amount)
+                }, function ()
+                    cb({id = itemCraftedId})
+                end)
+            end
+        end)
     end)
-    return item
 end

@@ -195,6 +195,7 @@ NUIService.NUIGiveItem = function(obj)
 		if player ~= PlayerId() then
 			if GetPlayerServerId(player) == tonumber(data.player) then
 				local itemName = data2.item
+				local itemId = data2.id
 				local metadata = data2.metadata
 				local target = tonumber(data.player)
 
@@ -208,7 +209,7 @@ NUIService.NUIGiveItem = function(obj)
 					TriggerServerEvent("vorpinventory:giveGoldToPlayer", target, tonumber(data2.count))
 				elseif tonumber(data2.id) == 0 then
 					local amount = tonumber(data2.count)
-					local item =  UserInventory[itemName]:FindByMetadata(metadata)
+					local item =  UserInventory[itemId]
 
 					if amount > 0 and item ~= nil and item:getCount() >= amount then
 						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, metadata)
@@ -216,7 +217,7 @@ NUIService.NUIGiveItem = function(obj)
 						-- TODO error message: Invalid amount of item
 					end
 				else
-					TriggerServerEvent("vorpinventory:serverGiveWeapon", tonumber(data2.id), target)
+					TriggerServerEvent("vorpinventory:serverGiveWeapon", tonumber(itemId), target)
 					TriggerServerEvent("vorpinventory:weaponlog", target, data2)
 				end
 
@@ -246,13 +247,13 @@ NUIService.NUIDropItem = function (obj)
 
 	if type == "item_standard" then
 		if aux.number ~= nil and aux.number ~= '' then
-			local item =  UserInventory[itemName]:FindById(itemId)
+			local item =  UserInventory[itemId]
 
 			if  qty > 0 and item ~= nil and item:getCount() >= qty then
 				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata)
 				item:quitCount(qty)
 				if item:getCount() == 0 then
-					UserInventory[itemName]:Sub(item)
+					UserInventory[itemId] = nil
 				end
 			end
 		end
@@ -329,9 +330,7 @@ end
 
 NUIService.NUIUseItem = function(data)
 	if data["type"] == "item_standard" then
-
-		TriggerServerEvent("vorp_inventory:useItem", data["item"])
-
+		TriggerServerEvent("vorp_inventory:useItem", data["item"], data["id"])
 	elseif data["type"] == "item_weapon" then
 
 		local _, weaponHash = GetCurrentPedWeapon(PlayerPedId(), false, 0, false)

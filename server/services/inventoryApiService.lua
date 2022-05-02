@@ -1,31 +1,32 @@
 InventoryAPI = {}
 UsableItemsFunctions = {}
 
-InventoryAPI.SaveInventoryItemsSupport = function(player)
-	Wait(1000)
-	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local identifier = sourceCharacter.identifier
-	local charId = sourceCharacter.charIdentifier
-	local items = {}
+-- InventoryAPI.SaveInventoryItemsSupport = function(player)
+-- 	Wait(1000)
+-- 	local _source = player
+-- 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+-- 	local identifier = sourceCharacter.identifier
+-- 	local charId = sourceCharacter.charIdentifier
+-- 	local items = {}
 
-	if (UsersInventories[identifier]) then
-		for _, item in pairs(UsersInventories[identifier]) do
-			table.insert(items, {name= item:getName(), amount= item:getCount(), metadata= item:getMetadata()})
-			--items[_] = item:getCount()
-		end
+-- 	if (UsersInventories[identifier]) ~= nil then
+-- 		for _, itemGroup in pairs(UsersInventories[identifier]) do
+-- 			for _, item in pairs(itemGroup.items) do
+-- 				table.insert(items, {name= item:getName(), count= item:getCount(), metadata= item:getMetadata()})
+-- 			end
+-- 			--items[_] = item:getCount()
+-- 		end
 
 
-		if (items) then
-			exports.ghmattimysql:execute("UPDATE characters SET inventory = @inventory WHERE identifier = @identifier AND charidentifier = @charid"
-				, {
-					['inventory'] = json.encode(items),
-					['identifier'] = identifier,
-					['charid'] = charId
-				}, function() end)
-		end
-	end
-end
+-- 		if (items) ~= nil then
+-- 			exports.ghmattimysql:execute("UPDATE user_inventories SET items = @items WHERE identifier = @identifier AND charidentifier = @charid", {
+-- 				['items'] = json.encode(items),
+-- 				['identifier'] = identifier,
+-- 				['charid'] = charId
+-- 			}, function() end)
+-- 		end
+-- 	end
+-- end
 
 InventoryAPI.canCarryAmountWeapons = function(player, amount, cb)
 	local _source = player
@@ -63,18 +64,20 @@ InventoryAPI.canCarryAmountItem = function(player, amount, cb)
 	end
 end
 
-InventoryAPI.canCarryItem = function(player, itemName, amount, cb)
+InventoryAPI.canCarryItem = function(player, itemName, amount, cb, metadata)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	metadata = metadata or {}
 
 	if svItems[itemName] then
 		local limit = svItems[itemName]:getLimit()
 
 		if limit ~= -1 then
 			if UsersInventories[identifier] ~= nil then
-				if UsersInventories[identifier][itemName] ~= nil then
-					local count = UsersInventories[identifier][itemName]:GetCount()
+				local item = UtilityService.FindItemByNameAndMetadata(identifier, itemName, metadata)
+				if item ~= nil then
+					local count = item:getCount()
 					local total = count + amount
 
 					if total <= limit then
@@ -150,36 +153,19 @@ InventoryAPI.getInventory = function(player, cb)
 	if UsersInventories[identifier] then
 		local playerItems = {}
 
-		for _, itemGroup in pairs(UsersInventories[identifier]) do
-			for _, item in pairs(itemGroup.items) do
-				local newItem = {
-					label = item:getLabel(),
-					name = item:getName(),
-					metadata = item:getMetadata(),
-					type = item:getType(),
-					count = item:getCount(),
-					limit = item:getLimit(),
-					usable = item:getCanUse(),
-					desc = item:getDesc()
-				}
-				table.insert(playerItems, newItem)
-			end
+		for _, item in pairs(UsersInventories[identifier]) do
+			local newItem = {
+				label = item:getLabel(),
+				name = item:getName(),
+				metadata = item:getMetadata(),
+				type = item:getType(),
+				count = item:getCount(),
+				limit = item:getLimit(),
+				canUse = item:getCanUse()
+			}
+			table.insert(playerItems, newItem)
 		end
 		cb(playerItems)
-	end
-end
-
-InventoryAPI.useItem = function(itemName, args)
-	local _source = source
-	if UsableItemsFunctions[itemName] then
-		if svItems[itemName] then
-			local arguments = {
-				source = _source,
-				item = svItems[itemName],
-				args = args
-			}
-			UsableItemsFunctions[itemName](arguments)
-		end
 	end
 end
 
@@ -269,14 +255,16 @@ InventoryAPI.subBullets = function(weaponId, bulletType, amount)
 	end
 end
 
-InventoryAPI.getItems = function(player, cb, item)
+InventoryAPI.getItems = function(player, cb, item, metadata)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	metadata = metadata or {}
 
 	if UsersInventories[identifier] ~= nil then
-		if UsersInventories[identifier][item] ~= nil then
-			cb(UsersInventories[identifier][item]:GetCount())
+		local item = UtilityService.FindItemByNameAndMetadata(identifier, item, metadata)
+		if item ~= nil then
+			cb(item:getCount())
 		else
 			cb(0)
 		end
@@ -340,95 +328,74 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 	local itemType = svItems[name]:getType()
 	local itemCanRemove = svItems[name]:getCanRemove()
 
-	if UsersInventories[identifier][name] ~= nil then
-		
-		if UsersInventories[identifier][name]:GetCount() + amount <= sourceItemLimit or sourceItemLimit == -1 then
-			local item = UsersInventories[identifier][name]:FindByMetadata(metadata)
-			if item == nil then
-				local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
-				item = Item:New({
-					id = dbCraftedItem.id,
-					count = amount,
-					limit = sourceItemLimit,
-					label = itemLabel,
-					metadata = metadata,
-					name = name,
-					type = itemType,
-					usable = true,
-					canRemove = itemCanRemove
-				})
-				UsersInventories[identifier][name]:Add(item)
-			else
-				if Config.MaxItemsInInventory.Items ~= -1 then
-					if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
-						item:addCount(amount)
-						DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
-						added = true
-					end
-				else
+	local item = UtilityService.FindItemByNameAndMetadata(identifier, name, metadata)
+
+	if item ~= nil then
+		if item:getCount() + amount <= sourceItemLimit or sourceItemLimit == -1 then
+			if Config.MaxItemsInInventory.Items ~= -1 then
+				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
 					item:addCount(amount)
 					DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 					added = true
 				end
+			else
+				item:addCount(amount)
+				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
+				added = true
 			end
 		end
 	else
-		UsersInventories[identifier][name] = ItemGroup:New(name)
-
-		if amount <= sourceItemLimit or sourceItemLimit == -1 then
-			local itemLabel = svItems[name]:getLabel()
-			local itemType = svItems[name]:getType()
-			local itemCanRemove = svItems[name]:getCanRemove()
-			local itemDesc = svItems[name]:getDesc()
-
-			if Config.MaxItemsInInventory.Items ~= -1 then
-				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
-					local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
-					UsersInventories[identifier][name]:Add(Item:New({
-						id = dbCraftedItem.id,
+		if Config.MaxItemsInInventory.Items ~= -1 then
+			if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
+				DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata, function (craftedItem)
+					item = Item:New({
+						id = craftedItem.id,
 						count = amount,
 						limit = sourceItemLimit,
 						label = itemLabel,
 						metadata = metadata,
 						name = name,
 						type = itemType,
-						usable = true,
-						canRemove = itemCanRemove,
-						desc = itemDesc
-					}))
-					added = true
-				end
-			else
-				local dbCraftedItem = DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata)
-				UsersInventories[identifier][name]:Add(Item:New({
-					id = dbCraftedItem.id,
+						canUse = true,
+						desc = itemDesc,
+						canRemove = itemCanRemove
+					})
+					UsersInventories[identifier][craftedItem.id] = item
+				end)
+				added = true
+			end
+		else
+			DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata, function (craftedItem)
+				item = Item:New({
+					id = craftedItem.id,
 					count = amount,
 					limit = sourceItemLimit,
 					label = itemLabel,
 					metadata = metadata,
 					name = name,
 					type = itemType,
-					usable = true,
-					canRemove = itemCanRemove,
-					desc = itemDesc
-				}))
-				added = true
-			end
+					canUse = true,
+					desc = itemDesc,
+					canRemove = itemCanRemove
+				})
+				UsersInventories[identifier][craftedItem.id] = item
+			end)
+			added = true
 		end
 	end
 
-	if UsersInventories[identifier][name] ~= nil and added then
-		local item = UsersInventories[identifier][name]:FindByMetadata(metadata)
+	Wait(500) -- FIXME DB to slow to finish work before code
 
-		local itemLimit = item:getLimit()
-		local itemLabel = item:getLabel()
-		local itemType = item:getType()
-		local itemUsable = item:getLimit()
-		local itemCanRemove = item:getCanRemove()
-		local itemMetadata = item:getMetadata()
-		local itemDesc = UsersInventories[identifier][name]:getDesc()
+	if item ~= nil and added then
+		-- local itemLimit = item:getLimit()
+		-- local itemLabel = item:getLabel()
+		-- local itemType = item:getType()
+		-- local itemUsable = item:getLimit()
+		-- local itemCanRemove = item:getCanRemove()
+		-- local itemMetadata = item:getMetadata()
+		-- local itemId = item:getId()
 
-		TriggerClientEvent("vorpCoreClient:addItem", _source, amount, itemLimit, itemLabel, name, itemType, itemUsable, itemCanRemove, itemMetadata)
+		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 		--InventoryAPI.SaveInventoryItemsSupport(_source)
 	else
 		TriggerClientEvent("vorp:Tip", _source, _U("fullInventory"), 2000)
@@ -456,24 +423,23 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 	end
 
 	if UsersInventories[identifier] ~= nil then
-		if UsersInventories[identifier][name] ~= nil then
-			local item = UsersInventories[identifier][name]:FindByMetadata(metadata)
-			if item ~= nil then
-				local sourceItemCount = item:getCount()
+		local item = UtilityService.FindItemByNameAndMetadata(identifier, name, metadata)
 
-				if amount <= sourceItemCount then
-					item:quitCount(amount)
-				else
-					return
-				end
+		if item ~= nil then
+			local sourceItemCount = item:getCount()
 
-				TriggerClientEvent("vorpCoreClient:subItem", _source, name, item:getCount(), metadata)
-
-				if item:getCount() == 0 then
-					UsersInventories[identifier][name]:Sub(item)
-				end
-				InventoryAPI.SaveInventoryItemsSupport(_source)
+			if amount <= sourceItemCount then
+				item:quitCount(amount)
+			else
+				return
 			end
+
+			TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
+
+			if item:getCount() == 0 then
+				UsersInventories[identifier][item:getId()] = nil
+			end
+			InventoryAPI.SaveInventoryItemsSupport(_source)
 		end
 	end
 end
@@ -636,8 +602,8 @@ end
 
 InventoryAPI.getUserTotalCount = function(identifier)
 	local userTotalItemCount = 0
-	for _, itemGroup in pairs(UsersInventories[identifier]) do
-		userTotalItemCount = userTotalItemCount + itemGroup:GetCount()
+	for _, item in pairs(UsersInventories[identifier]) do
+		userTotalItemCount = userTotalItemCount + item:getCount()
 	end
 	return userTotalItemCount
 end

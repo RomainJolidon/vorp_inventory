@@ -7,44 +7,32 @@ InventoryApiService = {}
 ---@param type string
 ---@param canUse boolean
 ---@param canRemove boolean
-InventoryApiService.addItem = function (count, limit, label, name, type, canUse, canRemove, desc, metadata)
-    if UserInventory[name] == nil then
-        UserInventory[name] = ItemGroup:New(name)
-    end
-    local item = UserInventory[name]:FindByMetadata(metadata)
+InventoryApiService.addItem = function (itemData)
+    local itemId = itemData.id
+    local itemAmount = itemData.count
+
+    local item = UserInventory[itemId]
 
     if item ~= nil then
-        item:addCount(count)
+        item:addCount(itemAmount)
     else
-        UserInventory[name]:Add(Item:New({
-            count = count,
-            limit = limit,
-            name = name,
-            label = label,
-            metadata = metadata,
-            type = type,
-            canUse = canUse,
-            canRemove = canRemove,
-            desc = desc
-        }))
+        UserInventory[itemId] = Item:New(itemData)
     end
     NUIService.LoadInv()
 end
 
----@param name string
+---@param id number
 ---@param qty number
 ---@param metadata table
-InventoryApiService.subItem = function (name, qty, metadata)
-    if UserInventory[name] == nil then
+InventoryApiService.subItem = function (id, qty, metadata)
+    if UserInventory[id] == nil then
         return
     end
 
-    local item = UserInventory[name]:FindByMetadata(metadata)
-    if item ~= nil then
-        item:setCount(qty)
-        if item:getCount() == 0 then
-            UserInventory[name]:Sub(item)
-        end
+
+    UserInventory[id]:setCount(qty)
+    if UserInventory[id]:getCount() == 0 then
+        UserInventory[id] = nil
     end
     NUIService.LoadInv()
 end

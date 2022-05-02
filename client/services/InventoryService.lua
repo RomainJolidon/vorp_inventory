@@ -5,15 +5,12 @@ UserWeapons = {}
 UserInventory = {}
 bulletsHash = {}
 
-InventoryService.receiveItem = function (name, amount, metadata)
-	if UserInventory[name] == nil then
-		UserInventory[name] = ItemGroup:New(name)
-	end
-	local item = UserInventory[name]:FindByMetadata(metadata)
-	if item ~= nil then
-		item:addCount(amount)
+InventoryService.receiveItem = function (name, id, amount, metadata)
+
+	if UserInventory[id] ~= nil then
+		UserInventory[id]:addCount(amount)
 	else
-		UserInventory[name]:Add(Item:New({
+		UserInventory[id] = Item:New({
 			count = amount,
 			limit = DB_Items[name].limit,
 			label = DB_Items[name].name,
@@ -22,7 +19,7 @@ InventoryService.receiveItem = function (name, amount, metadata)
 			type = "item_standard",
 			canUse = true,
 			canRemove = DB_Items[name].can_remove
-		}))
+		})
 	end
 	
 	UserInventory[name] = Item:New({
@@ -38,18 +35,18 @@ InventoryService.receiveItem = function (name, amount, metadata)
 	NUIService.LoadInv()
 end
 
-InventoryService.removeItem = function (name, count, metadata)
-	if UserInventory[name] == nil then
+InventoryService.removeItem = function (name, id, count, metadata)
+	if UserInventory[id] == nil then
 		return
 	end
 
-	local item = UserInventory[name]:FindByMetadata(metadata)
+	local item = UserInventory[id]
 
 	if item ~= nil then
 		item:quitCount(count)
 
 		if item:getCount() <= 0 then
-			UserInventory[name]:Sub(item)
+			UserInventory[id] = nil
 		end
 
 		NUIService.LoadInv()
@@ -173,10 +170,7 @@ InventoryService.getInventory = function (inventory)
 					desc = itemDesc
 				})
 
-				if UserInventory[item.item] == nil then
-					UserInventory[item.item] = ItemGroup:New(item.item)
-				end
-				UserInventory[item.item]:Add(newItem)
+				UserInventory[item.id] = newItem
 			end
 		end
 	end

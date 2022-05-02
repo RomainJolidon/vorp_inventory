@@ -57,3 +57,6 @@ AddEventHandler("vorpinventory:giveMoneyToPlayer", InventoryService.giveMoneyToP
 
 RegisterServerEvent("vorpinventory:giveGoldToPlayer")
 AddEventHandler("vorpinventory:giveGoldToPlayer", InventoryService.giveGoldToPlayer)
+
+RegisterServerEvent("vorp_inventory:useItem")
+AddEventHandler("vorp_inventory:useItem", InventoryService.UseItem)
