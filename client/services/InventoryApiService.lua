@@ -14,7 +14,7 @@ InventoryApiService.addItem = function (itemData)
     local item = UserInventory[itemId]
 
     if item ~= nil then
-        item:addCount(itemAmount)
+        item:setCount(itemAmount)
     else
         UserInventory[itemId] = Item:New(itemData)
     end

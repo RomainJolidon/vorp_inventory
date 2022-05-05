@@ -16,8 +16,8 @@ exports('vorp_inventoryApi',function()
         TriggerEvent("vorpCore:addItem",source,tostring(itemName),tonumber(cuantity), metadata)
     end
 
-    self.subItem = function(source,itemName,cuantity)
-        TriggerEvent("vorpCore:subItem",source,tostring(itemName),tonumber(cuantity))
+    self.subItem = function(source,itemName,cuantity, metadata)
+        TriggerEvent("vorpCore:subItem",source,tostring(itemName),tonumber(cuantity), metadata)
     end
 
     self.getItem = function(source, itemName)

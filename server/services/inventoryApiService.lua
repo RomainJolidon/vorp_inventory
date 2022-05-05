@@ -414,6 +414,7 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	local charIdentifier = sourceCharacter.charIdentifier
 
 	if svItems[name] == nil then
 		if Config.Debug then
@@ -438,8 +439,11 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 
 			if item:getCount() == 0 then
 				UsersInventories[identifier][item:getId()] = nil
+				DbService.DeleteItem(item:getId())
+			else
+				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 			end
-			InventoryAPI.SaveInventoryItemsSupport(_source)
+			--InventoryAPI.SaveInventoryItemsSupport(_source)
 		end
 	end
 end

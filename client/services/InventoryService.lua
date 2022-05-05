@@ -7,13 +7,15 @@ bulletsHash = {}
 
 InventoryService.receiveItem = function (name, id, amount, metadata)
 
+	print(json.encode(metadata))
 	if UserInventory[id] ~= nil then
 		UserInventory[id]:addCount(amount)
 	else
 		UserInventory[id] = Item:New({
+			id = id,
 			count = amount,
 			limit = DB_Items[name].limit,
-			label = DB_Items[name].name,
+			label = DB_Items[name].label,
 			name = name,
 			metadata = metadata,
 			type = "item_standard",
