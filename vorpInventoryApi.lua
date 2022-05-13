@@ -12,12 +12,12 @@ exports('vorp_inventoryApi',function()
         TriggerEvent("vorpCore:giveWeapon",source,weaponid,target)
     end
 
-    self.addItem = function(source,itemName,cuantity, metadata)
-        TriggerEvent("vorpCore:addItem",source,tostring(itemName),tonumber(cuantity), metadata)
+    self.addItem = function(source,itemName,qty, metadata)
+        TriggerEvent("vorpCore:addItem",source,tostring(itemName),tonumber(qty), metadata)
     end
 
-    self.subItem = function(source,itemName,cuantity, metadata)
-        TriggerEvent("vorpCore:subItem",source,tostring(itemName),tonumber(cuantity), metadata)
+    self.subItem = function(source,itemName,qty, metadata)
+        TriggerEvent("vorpCore:subItem",source,tostring(itemName),tonumber(qty), metadata)
     end
 
     self.getItem = function(source, itemName)
@@ -30,11 +30,11 @@ exports('vorp_inventoryApi',function()
         return item
     end
 
-    self.getItemCount = function(source,item)
+    self.getItemCount = function(source,item, metadata)
         local count = 0
         TriggerEvent("vorpCore:getItemCount",source,function(itemcount)
             count = itemcount
-        end,tostring(item))
+        end,tostring(item), metadata)
         return count
     end
 
@@ -61,12 +61,12 @@ exports('vorp_inventoryApi',function()
         return item
     end
 
-    self.addBullets = function(source,weaponId,type,cuantity)
-        TriggerEvent("vorpCore:addBullets",source,weaponId,type,cuantity)
+    self.addBullets = function(source,weaponId,type,qty)
+        TriggerEvent("vorpCore:addBullets",source,weaponId,type,qty)
     end
 
-    self.subBullets = function(source,weaponId,type,cuantity)
-        TriggerEvent("vorpCore:subBullets",source,weaponId,type,cuantity)
+    self.subBullets = function(source,weaponId,type,qty)
+        TriggerEvent("vorpCore:subBullets",source,weaponId,type,qty)
     end
 
     self.getWeaponBullets = function(source,weaponId)
@@ -101,39 +101,11 @@ exports('vorp_inventoryApi',function()
         return can
     end
 
-    self.canCarryItem = function(source, item, amount) 
-        local can = false
-        local done = false
-        
-        -- Limit is a restricted field in sql. Query for it directly gives an error.
-        exports.ghmattimysql:execute( "SELECT * FROM items WHERE item=@id;", {['@id'] = item}, 
-        function(result)
-
-            -- Add check for if the item exists.
-            local itemcount = self.getItemCount(source, item)
-            local reqCount = itemcount + amount
-            
-            if result[1] then
-                local limit = tonumber(result[1].limit)
-                if reqCount <= limit then
-                    can = true
-                else
-                    can = false
-                end
-            else
-                -- Object does not exist in inventory, it can not be added
-                print('Item does not exist in Items table. Item: '..item)
-                can = false
-            end
-            
-            done = true
-        end)
-
-        -- Wait for the call to finish (aka makes this task more syncronous)
-        while done == false do
-            Wait(500)
-        end
-
+    self.canCarryItem = function(source, item, amount, metadata)
+        local can
+        TriggerEvent("vorpCore:canCarryItem",source, item, amount,function(data)
+            can = data
+        end, metadata)
         return can
     end
 

@@ -327,6 +327,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 	local itemLabel = svItems[name]:getLabel()
 	local itemType = svItems[name]:getType()
 	local itemCanRemove = svItems[name]:getCanRemove()
+	local itemDefaultMetadata = svItems[name]:getMetadata()
 
 	local item = UtilityService.FindItemByNameAndMetadata(identifier, name, metadata)
 
@@ -353,7 +354,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 						count = amount,
 						limit = sourceItemLimit,
 						label = itemLabel,
-						metadata = metadata,
+						metadata = SharedUtils.MergeTables(itemDefaultMetadata, metadata),
 						name = name,
 						type = itemType,
 						canUse = true,
@@ -371,7 +372,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					count = amount,
 					limit = sourceItemLimit,
 					label = itemLabel,
-					metadata = metadata,
+					metadata = SharedUtils.MergeTables(itemDefaultMetadata, metadata),
 					name = name,
 					type = itemType,
 					canUse = true,

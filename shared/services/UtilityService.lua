@@ -32,3 +32,14 @@ SharedUtils.Table_equals = function (o1, o2, ignore_mt)
 
     return true
 end
+
+SharedUtils.MergeTables = function (a, b)
+    local newTable = {}
+    for key, value in pairs(a) do
+        newTable[key] = value
+    end
+    for key, value in pairs(b) do
+        newTable[key] = value
+    end
+    return newTable
+end
