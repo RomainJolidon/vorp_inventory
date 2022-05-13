@@ -87,6 +87,34 @@ InventoryService.DropAllMoney = function()
 	end
 end
 
+InventoryService.DropGold = function(amount)
+	local _source = source
+	local userCharacter = Core.getUser(_source).getUsedCharacter
+	local userGold = userCharacter.gold
+
+	if amount <= 0 then
+		TriggerClientEvent("vorp:TipRight", _source, _U("TryExploits"), 3000)
+	elseif userGold < amount then
+		TriggerClientEvent("vorp:TipRight", _source, _U("NotEnoughGold"), 3000)
+	else
+		userCharacter.removeCurrency(1, amount)
+
+		TriggerClientEvent("vorpInventory:createGoldPickup", _source, amount)
+	end
+end
+
+InventoryService.DropAllGold = function()
+	local _source = source
+	local userCharacter = Core.getUser(_source).getUsedCharacter
+	local userGold = userCharacter.gold
+
+	if userGold > 0 then
+		userCharacter.removeCurrency(1, userGold)
+
+		TriggerClientEvent("vorpInventory:createGoldPickup", _source, userGold)
+	end
+end
+
 InventoryService.giveMoneyToPlayer = function(target, amount)
 	local _source = source
 	if not inprocessing(_source) then
@@ -112,11 +140,10 @@ InventoryService.giveMoneyToPlayer = function(target, amount)
 			sourceCharacter.removeCurrency(0, amount)
 			targetCharacter.addCurrency(0, amount)
 
-			TriggerClientEvent("vorp:TipRight", _source, _U("YouPaid", tostring(amount), targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
-			TriggerClientEvent("vorp:TipRight", _target, _U("YouReceived", tostring(amount), sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
-			Wait(3000)
-			TriggerClientEvent("vorp_inventory:ProcessingReady", _source)
-		end
+		TriggerClientEvent("vorp:TipRight", _source, _U("YouPaidMoney", tostring(amount), targetCharacter.firstname .. " " .. targetCharacter.lastname), 3000)
+		TriggerClientEvent("vorp:TipRight", _target, _U("YouReceivedMoney", tostring(amount), sourceCharacter.firstname .. " " .. sourceCharacter.lastname), 3000)
+		Wait(3000)
+		TriggerClientEvent("vorp_inventory:ProcessingReady", _source)
 		trem(_source)
 	end
 end

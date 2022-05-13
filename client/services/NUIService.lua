@@ -207,7 +207,7 @@ NUIService.NUIGiveItem = function(obj)
 					if isProcessingPay then return end
 					isProcessingPay = true
 					TriggerServerEvent("vorpinventory:giveGoldToPlayer", target, tonumber(data2.count))
-				elseif tonumber(data2.id) == 0 then
+				elseif data2.type == "item_standard" then
 					local amount = tonumber(data2.count)
 					local item =  UserInventory[itemId]
 
@@ -431,6 +431,7 @@ NUIService.LoadInv = function()
 
 	payload.action = "setItems"
 	payload.itemList = items
+	payload.useGold = Config.GoldAsItem
 
 	SendNUIMessage(payload)
 end

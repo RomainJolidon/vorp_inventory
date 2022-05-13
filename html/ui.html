@@ -887,7 +887,7 @@
                     $(".site-cm-box").remove();
                     dialog.close();
                 } else if (event.data.action == "setItems") {
-                    inventorySetup(event.data.itemList);
+                    inventorySetup(event.data.itemList, event.data.useGold);
 
                     if (type != "main") {
 
@@ -1083,13 +1083,13 @@
             }
         }
 
-        function giveGetHowManyMoney() {
+        function giveGetHowManyMoney(item) {
             dialog.prompt({
                 title: "Quantity",
                 button: "Accept",
                 required: true,
-                item: "money",
-                type: "item_money",
+                item: item,
+                type: `item_${item}`,
                 input: {
                     type: "number",
                     autofocus: "true"
@@ -1108,7 +1108,6 @@
                     return true;
                 }
             });
-
         }
 
         function giveGetHowManyGold() {
@@ -1144,7 +1143,7 @@
             isOpen = false;
         }
 
-        function inventorySetup(items) {
+        function inventorySetup(items, useGold) {
             $("#inventoryElement").html("");
 
 
@@ -1265,8 +1264,8 @@
 
             data.push({
                 text: "Give money",
-                action: function () {
-                    giveGetHowManyMoney();
+                action: function() {
+                    giveGetHowManyMoney(m_item);
                 }
             });
 
@@ -1296,6 +1295,51 @@
 
             $('#item-' + m_item).data('item', m_item);
             $('#item-' + m_item).data('inventory', "none");
+
+            if (useGold) {
+                //AddGold
+                var m_item = "gold";
+                var m_label = "Gold";
+    
+    
+                $("#inventoryElement").append("<div data-label='" + m_label + "' style='background-image: url(\"img/items/" + m_item + ".png\"), url(); background-size: 90px 90px, 90px 90px; background-repeat: no-repeat; background-position: center;' id='item-" + m_item + "' class='item'><div class='text'></div></div>")
+    
+                var data = [];
+    
+                data.push({
+                    text: "Give gold",
+                    action: function() {
+                        giveGetHowManyMoney(m_item);
+                    }
+                });
+    
+                data.push({
+                    text: "Drop gold",
+                    action: function() {
+                        dropGetHowMany(m_item, "item_gold", "asd", 0);
+                    }
+                });
+    
+    
+    
+                $("#item-" + m_item).contextMenu([data], {
+                    offsetX: 1,
+                    offsetY: 1,
+                });
+    
+    
+                $("#item-" + m_item).hover(
+                    function() {
+                        OverSetTitle(m_label);
+                    },
+                    function() {
+                        OverSetTitle(" ");
+                    }
+                );
+    
+                $('#item-' + m_item).data('item', m_item);
+                $('#item-' + m_item).data('inventory', "none");
+            }
 
             isOpen = true;
             initDivMouseOver()

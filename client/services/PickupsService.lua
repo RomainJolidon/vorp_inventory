@@ -71,11 +71,14 @@ PickupsService.createMoneyPickup = function(amount)
 end
 
 PickupsService.createGoldPickup = function(amount)
+	if not Config.GoldAsItem then
+		return
+	end
 	local playerPed = PlayerPedId()
 	local coords = GetEntityCoords(playerPed, true, true)
 	local forward = GetEntityForwardVector(playerPed)
 	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
-	local pickupModel = "p_moneybag02x"
+	local pickupModel = "s_pickup_goldbar01x"
 
 	if dropAll then
 		local randomOffsetX = math.random(-35, 35)
@@ -128,6 +131,7 @@ PickupsService.shareMoneyPickupClient = function(entityHandle, amount, position,
 				entityId = entityHandle,
 				amount = amount,
 				isMoney = true,
+				isGold = false,
 				coords = position,
 				prompt = Prompt:New(0xF84FA74F, _U("TakeFromFloor"), PromptType.StandardHold, promptGroup)
 			})
@@ -154,6 +158,7 @@ PickupsService.shareGoldPickupClient = function(entityHandle, amount, position, 
 				name = "Gold (" .. tostring(amount) .. ")",
 				entityId = entityHandle,
 				amount = amount,
+				isMoney = false,
 				isGold = true,
 				coords = position,
 				prompt = Prompt:New(0xF84FA74F, _U("TakeFromFloor"), PromptType.StandardHold, promptGroup)
