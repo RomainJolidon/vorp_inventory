@@ -331,21 +331,21 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 
 	local item = UtilityService.FindItemByNameAndMetadata(identifier, name, metadata)
 
-	if item ~= nil then
+	if item ~= nil then -- Item already exist in inventory
 		if item:getCount() + amount <= sourceItemLimit or sourceItemLimit == -1 then
 			if Config.MaxItemsInInventory.Items ~= -1 then
 				if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
 					item:addCount(amount)
 					DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
-					added = true
+					TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 				end
 			else
 				item:addCount(amount)
 				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
-				added = true
+				TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 			end
 		end
-	else
+	else -- Item does not exist in inventory
 		if Config.MaxItemsInInventory.Items ~= -1 then
 			if sourceInventoryItemCount <= Config.MaxItemsInInventory.Items then
 				DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata, function (craftedItem)
@@ -362,8 +362,9 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 						canRemove = itemCanRemove
 					})
 					UsersInventories[identifier][craftedItem.id] = item
+					TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 				end)
-				added = true
+				return
 			end
 		else
 			DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata, function (craftedItem)
@@ -380,27 +381,14 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					canRemove = itemCanRemove
 				})
 				UsersInventories[identifier][craftedItem.id] = item
+				TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 			end)
-			added = true
+			return
 		end
 	end
 
-	Wait(500) -- FIXME DB to slow to finish work before code
-
-	if item ~= nil and added then
-		-- local itemLimit = item:getLimit()
-		-- local itemLabel = item:getLabel()
-		-- local itemType = item:getType()
-		-- local itemUsable = item:getLimit()
-		-- local itemCanRemove = item:getCanRemove()
-		-- local itemMetadata = item:getMetadata()
-		-- local itemId = item:getId()
-
-		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
-		--InventoryAPI.SaveInventoryItemsSupport(_source)
-	else
-		TriggerClientEvent("vorp:Tip", _source, _U("fullInventory"), 2000)
-	end
+	-- inventory is full
+	TriggerClientEvent("vorp:Tip", _source, _U("fullInventory"), 2000)
 end
 
 InventoryAPI.subItem = function(player, name, amount, metadata)

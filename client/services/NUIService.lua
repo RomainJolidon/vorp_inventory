@@ -210,9 +210,9 @@ NUIService.NUIGiveItem = function(obj)
 				elseif data2.type == "item_standard" then
 					local amount = tonumber(data2.count)
 					local item =  UserInventory[itemId]
-
+					
 					if amount > 0 and item ~= nil and item:getCount() >= amount then
-						TriggerServerEvent("vorpinventory:serverGiveItem", itemName, amount, target, metadata)
+						TriggerServerEvent("vorpinventory:serverGiveItem", itemId, amount, target)
 					else
 						-- TODO error message: Invalid amount of item
 					end

@@ -7,7 +7,6 @@ bulletsHash = {}
 
 InventoryService.receiveItem = function (name, id, amount, metadata)
 
-	print(json.encode(metadata))
 	if UserInventory[id] ~= nil then
 		UserInventory[id]:addCount(amount)
 	else
@@ -100,7 +99,8 @@ InventoryService.processItems = function (items)
 			can_remove = item.can_remove,
 			type = item.type,
 			usable = item.usable,
-			desc = item.desc
+			desc = item.desc,
+			metadata = item.metadata
 		}
 	end
 end
