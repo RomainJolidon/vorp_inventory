@@ -255,7 +255,7 @@ InventoryService.subItem = function(target, itemId, amount)
 	
 				if item:getCount() == 0 then
 					UsersInventories[identifier][itemId] = nil
-					DbService.DeleteItem(itemId)
+					DbService.DeleteItem(charIdentifier, itemId)
 				else
 					DbService.SetItemAmount(charIdentifier, itemId, item:getCount())
 				end
@@ -636,7 +636,7 @@ InventoryService.GiveItem = function(itemId, amount, target)
 		TriggerClientEvent("vorpInventory:removeItem", _source, itemName, item:getId(), amount)
 
 		if item:getCount() - amount <= 0 then
-			DbService.DeleteItem(item:getId())
+			DbService.DeleteItem(sourceCharIdentifier, item:getId())
 			UsersInventories[sourceIdentifier][item:getId()] = nil
 		else
 			item:quitCount(amount)

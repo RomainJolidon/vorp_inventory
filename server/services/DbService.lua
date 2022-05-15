@@ -43,9 +43,10 @@ DbService.PickupItem = function (sourceCharIdentifier, itemCraftedId)
     })
 end
 
-DbService.DeleteItem = function (itemCraftedId)
-    Log.print('Delete item')
-    exports.ghmattimysql:execute("DELETE FROM character_inventories WHERE item_crafted_id = @itemid;", {
+DbService.DeleteItem = function (sourceCharIdentifier, itemCraftedId)
+    Log.print('Character[' .. tostring(sourceCharIdentifier) .. '] Delete Item[' .. tostring(itemCraftedId) .. ']')
+    exports.ghmattimysql:execute("DELETE FROM character_inventories WHERE character_id = @charid AND item_crafted_id = @itemid;", {
+        ['charid'] = tonumber(sourceCharIdentifier),
         ['itemid'] =  tonumber(itemCraftedId)
     }, function ()
         -- Do we delete this item ?
@@ -56,7 +57,7 @@ DbService.DeleteItem = function (itemCraftedId)
 end
 
 DbService.CreateItem = function(sourceCharIdentifier, itemId, amount, metadata, cb)
-    Log.print('Create Item')
+    Log.print('Character[' .. tostring(sourceCharIdentifier) .. '] Create ' .. tostring(amount) .. 'x Item[' .. tostring(itemId) .. ']')
     exports.ghmattimysql:execute("INSERT INTO items_crafted (character_id, item_id, metadata) VALUES (@charid, @itemid, @metadata);", {
         ['charid'] = tonumber(sourceCharIdentifier),
         ['itemid'] = tonumber(itemId),
@@ -70,9 +71,7 @@ DbService.CreateItem = function(sourceCharIdentifier, itemId, amount, metadata, 
         }, function (result)
             if result ~= nil and result[1] ~= nil then
                 local item = result[1]
-                local itemCraftedId = item.id
-                print('inserting into character_inventories')
-    
+                local itemCraftedId = item.id    
                 exports.ghmattimysql:execute("INSERT INTO character_inventories (character_id, item_crafted_id, amount) VALUES (@charid, @itemid, @amount);", {
                     ['charid'] = tonumber(sourceCharIdentifier),
                     ['itemid'] = tonumber(itemCraftedId),

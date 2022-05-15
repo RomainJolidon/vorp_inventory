@@ -428,7 +428,7 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 
 			if item:getCount() == 0 then
 				UsersInventories[identifier][item:getId()] = nil
-				DbService.DeleteItem(item:getId())
+				DbService.DeleteItem(charIdentifier, item:getId())
 			else
 				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 			end
