@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS `character_inventories` (
   `amount` int(11) DEFAULT NULL,
   `created_at` TIMESTAMP DEFAULT now()
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
---PRIMARY KEY (`character_id`, `inventory_type`)
 
 -- Convert Json items into separate rows and insert them in items_crafted
 INSERT INTO items_crafted (

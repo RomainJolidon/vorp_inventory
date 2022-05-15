@@ -626,7 +626,6 @@ InventoryAPI.onNewCharacter = function(playerId)
 
 	-- Attempt to add all starter items/weapons from the Config.lua
 	for key, value in pairs(Config.startItems) do
-
 		TriggerEvent("vorpCore:addItem", playerId, tostring(key), tonumber(value), {})
 	end
 
