@@ -147,7 +147,6 @@ InventoryService.getInventory = function (inventory)
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do
-			print(json.encode(item))
 			if DB_Items[item.item] ~= nil then
 				local dbItem = DB_Items[item.item]
 				local itemAmount = tonumber(item.amount)
