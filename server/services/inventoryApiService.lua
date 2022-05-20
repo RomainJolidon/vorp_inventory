@@ -68,7 +68,7 @@ InventoryAPI.canCarryItem = function(player, itemName, amount, cb, metadata)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
-	metadata = metadata or {}
+	metadata = SharedUtils.MergeTables(svItems[itemName].metadata, metadata or {})
 
 	if svItems[itemName] then
 		local limit = svItems[itemName]:getLimit()
@@ -259,7 +259,7 @@ InventoryAPI.getItems = function(player, cb, item, metadata)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
-	metadata = metadata or {}
+	metadata = SharedUtils.MergeTables(svItems[item].metadata, metadata or {})
 
 	if UsersInventories[identifier] ~= nil then
 		local item = UtilityService.FindItemByNameAndMetadata(identifier, item, metadata)
@@ -296,7 +296,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 		return
 	end
 
-	metadata = metadata or {}
+	metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata or {})
 
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -394,12 +394,11 @@ end
 InventoryAPI.subItem = function(player, name, amount, metadata)
 	local _source = player
 	local sourceUser = Core.getUser(_source)
-	metadata = metadata or {}
+	metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata or {})
 
 	if (sourceUser) == nil then
 		return
 	end
-
 
 	local sourceCharacter = sourceUser.getUsedCharacter
 	local identifier = sourceCharacter.identifier

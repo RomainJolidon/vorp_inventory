@@ -270,7 +270,7 @@ InventoryService.addItem = function(target, name, amount, metadata, cb)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charIdentifier = sourceCharacter.charIdentifier
-	metadata = metadata or {}
+	metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata or {})
 
 	if UsersInventories[identifier] ~= nil then
 		local item = UtilityService.FindItemByNameAndMetadata(identifier, name, metadata)
@@ -560,7 +560,6 @@ InventoryService.GiveWeapon = function(weaponId, target)
 end
 
 InventoryService.GiveItem = function(itemId, amount, target)
-	print('give item')
 	local _source = source
 	if inprocessing(_source) then
 		return
