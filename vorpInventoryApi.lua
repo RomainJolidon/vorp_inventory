@@ -81,7 +81,7 @@ exports('vorp_inventoryApi',function()
         local comp
         TriggerEvent("vorpCore:getWeaponComponents",source,function(components)
             comp = components
-        end,weaponId) 
+        end,weaponId)
         return comp
     end
 

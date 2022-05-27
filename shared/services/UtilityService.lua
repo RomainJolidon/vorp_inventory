@@ -34,6 +34,9 @@ SharedUtils.Table_equals = function (o1, o2, ignore_mt)
 end
 
 SharedUtils.MergeTables = function (a, b)
+    a = type(a) == 'string' and json.decode(a) or a
+    b = type(b) == 'string' and json.decode(b) or b
+
     local newTable = {}
     for key, value in pairs(a) do
         newTable[key] = value
