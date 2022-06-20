@@ -279,6 +279,22 @@ InventoryAPI.getItems = function(player, cb, item)
 	end
 end
 
+InventoryAPI.getItem = function(player, item, cb)
+	local _source = player
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local identifier = sourceCharacter.identifier
+
+	if (UsersInventories[identifier]) ~= nil then
+		if (UsersInventories[identifier][item]) ~= nil then
+			cb(UsersInventories[identifier][item])
+		else
+			cb(nil)
+		end
+	else
+		cb(nil)
+	end
+end
+
 InventoryAPI.addItem = function(player, name, amount)
 	local _source = player
 	local sourceUser = Core.getUser(_source)

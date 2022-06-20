@@ -1,0 +1,21 @@
+<1.0.7>
+- Bugfix canCarryItem was erroring with invalid items.
+- Server API Feature getItem added!
+- Server API Feature getDBItem added!
+- Server API Enhancement canCarryWeapons added to API, was only available as serverEvent prior.
+<1.0.6>
+- Language updates and fixes
+- added option to display containers capacity
+<1.0.5>
+- Open Inventory from InventoryAPI Added
+- Show server ID when giving items/money/weapons
+- canCarryItem InventoryAPI Bugfix
+<1.0.4>
+- fix exploit for decimal values being and when moving giving droping items that would make items be unlimited and not even removable
+- update fxmanifest << yes update
+- updated ui.html file in the html folder
+<1.0.3>
+- fixed duplication items when spamclick users name when giving items
+- update server/services/ inventoryService.lua file 
+- update your fxmanifest version to 1.0.3 if you dont do this your version check will fail
+<1.0.2>

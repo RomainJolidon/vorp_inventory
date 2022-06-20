@@ -20,12 +20,45 @@ exports('vorp_inventoryApi',function()
         TriggerEvent("vorpCore:subItem",source,tostring(itemName),tonumber(cuantity))
     end
 
+    self.getItem = function(source, itemName)
+        local item
+        
+        TriggerEvent("vorpCore:getItem", source, tostring(itemName), function(responseItem)
+            item = responseItem
+        end)
+
+        return item
+    end
+
     self.getItemCount = function(source,item)
         local count = 0
         TriggerEvent("vorpCore:getItemCount",source,function(itemcount)
             count = itemcount
         end,tostring(item))
         return count
+    end
+
+    self.getDBItem = function(source, itemName)
+        local item
+        local done = false
+
+        exports.ghmattimysql:execute( "SELECT * FROM items WHERE item=@id;", {['@id'] = itemName}, 
+            function(result)
+                -- Add check for if the item exists.
+                if result[1] then
+                    item = result[1]
+                else
+                    print('Item does not exist in Items table. Item: '..itemName)
+                end
+                done = true
+            end)
+
+        -- Wait for the call to finish (aka makes this task more syncronous)
+        while done == false do
+            Wait(500)
+        end
+
+        return item
     end
 
     self.addBullets = function(source,weaponId,type,cuantity)
@@ -55,7 +88,7 @@ exports('vorp_inventoryApi',function()
     self.getUserWeapons = function(source)
         local weapList
         TriggerEvent("vorpCore:getUserWeapons",source,function(weapons)
-            weap = weapons
+            weapList = weapons
         end)
         return weapList
     end
@@ -69,15 +102,38 @@ exports('vorp_inventoryApi',function()
     end
 
     self.canCarryItem = function(source, item, amount) 
-        local can
-        exports.ghmattimysql:execute( "SELECT limit FROM items WHERE item=@id;", {['@id'] = item}, 
-        function(result) 
-            if self.getItemCount(source, item) + amount <= tonumber(result) then
-                can = true
+        local can = false
+        local done = false
+        
+        -- Limit is a restricted field in sql. Query for it directly gives an error.
+        exports.ghmattimysql:execute( "SELECT * FROM items WHERE item=@id;", {['@id'] = item}, 
+        function(result)
+
+            -- Add check for if the item exists.
+            local itemcount = self.getItemCount(source, item)
+            local reqCount = itemcount + amount
+            
+            if result[1] then
+                local limit = tonumber(result[1].limit)
+                if reqCount <= limit then
+                    can = true
+                else
+                    can = false
+                end
             else
+                -- Object does not exist in inventory, it can not be added
+                print('Item does not exist in Items table. Item: '..item)
                 can = false
             end
+            
+            done = true
         end)
+
+        -- Wait for the call to finish (aka makes this task more syncronous)
+        while done == false do
+            Wait(500)
+        end
+
         return can
     end
 
@@ -101,8 +157,16 @@ exports('vorp_inventoryApi',function()
         return inv
     end
 
+    self.canCarryWeapons = function(source, player, amount, cb)
+        TriggerEvent("vorpCore:canCarryWeapons", source, player, amount, cb)
+    end
+
     self.CloseInv = function(source) -- TODO NOT IMPLEMENTED
         TriggerClientEvent("vorp_inventory:CloseInv",source)
+    end
+
+    self.OpenInv = function(source)
+        TriggerClientEvent("vorp_inventory:OpenInv",source)
     end
     
     return self
