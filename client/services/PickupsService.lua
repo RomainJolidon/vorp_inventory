@@ -70,7 +70,7 @@ PickupsService.createMoneyPickup = function(amount)
 end
 
 PickupsService.createGoldPickup = function(amount)
-	if not Config.GoldAsItem then
+	if not Config.UseGoldItem then
 		return
 	end
 	local playerPed = PlayerPedId()
@@ -237,21 +237,19 @@ PickupsService.dropAllPlease = function()
 	if Config.DropOnRespawn.Items then
 		local items = UserInventory
 
-		for _, itemGroup in pairs(items) do
-			for _, item in pairs(itemGroup.items) do
-				local itemName = item:getName()
-				local itemCount = item:getCount()
-				local itemMetadata = item:getMetadata()
-	
-				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount, itemMetadata)
-				item:quitCount(itemCount)
-	
-				if item:getCount() == 0 then
-					UserInventory[itemName]:Sub(item)
-				end
-	
-				Wait(200)
+		for _, item in pairs(items) do
+			local itemName = item:getName()
+			local itemCount = item:getCount()
+			local itemMetadata = item:getMetadata()
+
+			TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemCount, itemMetadata)
+			item:quitCount(itemCount)
+
+			if item:getCount() == 0 then
+				UserInventory[item.id] = nil
 			end
+
+			Wait(200)
 		end
 	end
 

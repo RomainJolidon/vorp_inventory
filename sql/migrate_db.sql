@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS `items_crafted` (
 
 CREATE TABLE IF NOT EXISTS `character_inventories` (
   `character_id` int(11) DEFAULT NULL REFERENCES characters(charidentifier),
-  `inventory_type` ENUM('default', 'horse', 'cart', 'hideout', 'container', 'clan') NOT NULL DEFAULT 'default',
+  `inventory_type` varchar(100) NOT NULL DEFAULT 'default',
   `item_crafted_id` int(11) NOT NULL REFERENCES items_crafted(id),
   `amount` int(11) DEFAULT NULL,
   `created_at` TIMESTAMP DEFAULT now()
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
--- Create inndex to speed up request for each character inventory
+-- Create index to speed up request for each character inventory
 CREATE INDEX character_inventory_idx ON character_inventories(character_id, inventory_type);
 
 -- Convert Json items into separate rows and insert them in items_crafted
@@ -32,6 +32,9 @@ WITH
   c AS (SELECT charidentifier, inventory FROM characters )
 SELECT c.charidentifier, i.id, '{}' as metadata FROM i JOIN c
     WHERE JSON_CONTAINS(JSON_KEYS(c.inventory), JSON_QUOTE(i.item), '$');
+
+-- Create inndex to speed up request for each character inventory
+CREATE INDEX crafted_item_idx ON items_crafted(character_id);
 
 -- Assignamount to newly created items and Assign character and inventory type
 INSERT INTO character_inventories (
@@ -48,3 +51,5 @@ SELECT c.charidentifier, 'default', ic.id, JSON_EXTRACT(c.inventory, CONCAT('$.'
     WHERE JSON_CONTAINS(JSON_KEYS(c.inventory), JSON_QUOTE(i.item), '$')
       AND ic.item_id = i.id AND ic.character_id = c.charidentifier
 GROUP BY c.charidentifier, ic.id, c.inventory;
+
+-- (_utf8mb4'{}')

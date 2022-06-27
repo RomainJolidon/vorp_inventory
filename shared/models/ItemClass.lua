@@ -16,7 +16,7 @@ Item.weight = nil
 Item.canUse = false 
 Item.canRemove = false
 Item.desc = nil
-Item.dropOnDeath = false 
+Item.dropOnDeath = false
 
 -- ID
 function Item:setId(id) 

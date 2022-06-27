@@ -1,33 +1,6 @@
 InventoryAPI = {}
 UsableItemsFunctions = {}
 
--- InventoryAPI.SaveInventoryItemsSupport = function(player)
--- 	Wait(1000)
--- 	local _source = player
--- 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
--- 	local identifier = sourceCharacter.identifier
--- 	local charId = sourceCharacter.charIdentifier
--- 	local items = {}
-
--- 	if (UsersInventories[identifier]) ~= nil then
--- 		for _, itemGroup in pairs(UsersInventories[identifier]) do
--- 			for _, item in pairs(itemGroup.items) do
--- 				table.insert(items, {name= item:getName(), count= item:getCount(), metadata= item:getMetadata()})
--- 			end
--- 			--items[_] = item:getCount()
--- 		end
-
-
--- 		if (items) ~= nil then
--- 			exports.ghmattimysql:execute("UPDATE user_inventories SET items = @items WHERE identifier = @identifier AND charidentifier = @charid", {
--- 				['items'] = json.encode(items),
--- 				['identifier'] = identifier,
--- 				['charid'] = charId
--- 			}, function() end)
--- 		end
--- 	end
--- end
-
 InventoryAPI.canCarryAmountWeapons = function(player, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -302,6 +275,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 	end
 
 	SvUtils.ProcessUser(_source)
+	
 
 	metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata or {})
 
@@ -313,7 +287,7 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 		if Config.Debug then
 			Log.Warning("Item: [^2" .. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
 		end
-		SvUtils.Trem(_source)
+		SvUtils.Trem(_source, false)
 		return
 	end
 
@@ -322,11 +296,12 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 	end
 
 	if UsersInventories[identifier] == nil then
-		SvUtils.Trem(_source)
+		SvUtils.Trem(_source, false)
 		return
 	end
 
 	if amount <= 0 then
+		SvUtils.Trem(_source, false)
 		return
 	end
 
@@ -347,11 +322,15 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					item:addCount(amount)
 					DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 					TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+					SvUtils.Trem(_source, false)
+					return
 				end
 			else
 				item:addCount(amount)
 				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
 				TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+				SvUtils.Trem(_source, false)
+				return
 			end
 		end
 	else -- Item does not exist in inventory
@@ -367,13 +346,12 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 						name = name,
 						type = itemType,
 						canUse = true,
-						desc = itemDesc,
 						canRemove = itemCanRemove
 					})
 					UsersInventories[identifier][craftedItem.id] = item
 					TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+					SvUtils.Trem(_source, false)
 				end)
-				SvUtils.Trem(_source)
 				return
 			end
 		else
@@ -387,20 +365,19 @@ InventoryAPI.addItem = function(player, name, amount, metadata)
 					name = name,
 					type = itemType,
 					canUse = true,
-					desc = itemDesc,
 					canRemove = itemCanRemove
 				})
 				UsersInventories[identifier][craftedItem.id] = item
 				TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+				SvUtils.Trem(_source, false)
 			end)
-			SvUtils.Trem(_source)
 			return
 		end
 	end
 
 	-- inventory is full
 	TriggerClientEvent("vorp:Tip", _source, _U("fullInventory"), 2000)
-	SvUtils.Trem(_source)
+	SvUtils.Trem(_source, false)
 end
 
 InventoryAPI.subItem = function(player, name, amount, metadata)
@@ -426,7 +403,7 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 		if Config.Debug then
 			Log.Warning("Item: [^2" .. name .. "^7] ^1 do not exist on Database please add this item on ^7 Table Items")
 		end
-		SvUtils.Trem(_source)
+		SvUtils.Trem(_source, false)
 		return
 	end
 
@@ -439,7 +416,7 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 			if amount <= sourceItemCount then
 				item:quitCount(amount)
 			else
-				SvUtils.Trem(_source)
+				SvUtils.Trem(_source, false)
 				return
 			end
 
@@ -454,7 +431,7 @@ InventoryAPI.subItem = function(player, name, amount, metadata)
 			--InventoryAPI.SaveInventoryItemsSupport(_source)
 		end
 	end
-	SvUtils.Trem(_source)
+	SvUtils.Trem(_source, false)
 end
 
 InventoryAPI.registerWeapon = function(target, name, ammos, components)

@@ -94,13 +94,13 @@ AddEventHandler("vorp_inventory:OpenContainerInventory", NUIService.OpenContaine
 RegisterNetEvent("vorp_inventory:ReloadContainerInventory")
 AddEventHandler("vorp_inventory:ReloadContainerInventory", NUIService.ReloadInventory)
 
--- Transactions
-RegisterNetEvent("vorp_inventory:transactionStarted")
-AddEventHandler("vorp_inventory:transactionStarted", NUIService.transactionStarted)
-
-RegisterNetEvent("vorp_inventory:transactionCompleted")
-AddEventHandler("vorp_inventory:transactionCompleted", NUIService.transactionComplete)
-
 RegisterNUICallback("TakeFromContainer", NUIService.NUITakeFromContainer);
 
 RegisterNUICallback("MoveToContainer", NUIService.NUIMoveToContainer);
+
+-- Transactions
+RegisterNetEvent("vorp_inventory:transactionStarted")
+AddEventHandler("vorp_inventory:transactionStarted", NUIService.TransactionStarted)
+
+RegisterNetEvent("vorp_inventory:transactionCompleted")
+AddEventHandler("vorp_inventory:transactionCompleted", NUIService.TransactionComplete)

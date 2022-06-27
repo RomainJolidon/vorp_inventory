@@ -31,7 +31,6 @@ InventoryService.receiveItem = function (name, id, amount, metadata)
 		type = "item_standard",
 		canUse = true,
 		canRemove = DB_Items[name].can_remove,
-		desc = DB_Items[name].desc
 	})
 	NUIService.LoadInv()
 end
@@ -99,7 +98,6 @@ InventoryService.processItems = function (items)
 			can_remove = item.can_remove,
 			type = item.type,
 			usable = item.usable,
-			desc = item.desc,
 			metadata = item.metadata
 		}
 	end
@@ -141,9 +139,8 @@ InventoryService.getLoadout = function (loadout)
 end
 
 InventoryService.getInventory = function (inventory)
-	UserInventory = {}
-	
 	if inventory ~= nil and inventory ~= '' then
+		UserInventory = {}
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do
@@ -156,7 +153,6 @@ InventoryService.getInventory = function (inventory)
 				local itemCanRemove = dbItem.can_remove
 				local itemType = dbItem.type
 				local itemCanUse = dbItem.usable
-				local itemDesc = dbItem.desc
 				local itemDefaultMetadata = dbItem.metadata
 
 				local newItem = Item:New({
@@ -169,7 +165,6 @@ InventoryService.getInventory = function (inventory)
 					type = itemType,
 					canUse = itemCanUse,
 					canRemove = itemCanRemove,
-					desc = itemDesc
 				})
 
 				UserInventory[item.id] = newItem

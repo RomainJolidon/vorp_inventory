@@ -4,13 +4,13 @@
 
 Config = {
 
-  Debug = false, -- if your server is live set this to false.  to true only if you are testing things
-  DevMode = false, -- if your server is live set this to false.  to true only if you are testing things (auto load inventory when script restart and before character selection. Alos add /getInv command)
+  Debug = true, -- if your server is live set this to false.  to true only if you are testing things
+  DevMode = true, -- if your server is live set this to false.  to true only if you are testing things (auto load inventory when script restart and before character selection. Alos add /getInv command)
 
   defaultlang = "en_lang",
 
   -- GOLD ITEM LIKE DOLLARS
-  UseGoldItem = false, -- IF TRUE YOU HAVE GOLD IN INVENTORY LIKE DOLLARS
+  UseGoldItem = true, -- IF TRUE YOU HAVE GOLD IN INVENTORY LIKE DOLLARS
   -- CHANGE IN html/js/config.js TOO !!!
 
   -- DEATH FUNCTIONS
@@ -21,9 +21,6 @@ Config = {
 
   --RMB mouse PROMPT PICKUP
   PickupKey = 0xF84FA74F,
-
-  --Display Gold like Money in inventory
-  GoldAsItem = false,
 
   -- LOGS 
   webhookavatar = "https://cdn3.iconfinder.com/data/icons/hand/500/Hand_give_thumbs_finger-512.png",

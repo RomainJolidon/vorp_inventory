@@ -71,7 +71,6 @@ Utils.addItems = function(name, id, amount)
 			type = "item_standard",
 			canUse = true,
 			canRemove = DB_Items[name].can_remove,
-			desc = DB_Items[name].desc
 		})
 	end
 end

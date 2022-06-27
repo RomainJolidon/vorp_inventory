@@ -393,22 +393,8 @@ NUIService.LoadInv = function()
 	TriggerServerEvent("vorpinventory:check_slots")
 
 
-	for _, itemGroup in pairs(UserInventory) do
-		for _, currentItem in pairs(itemGroup.items) do
-			local item = {}
-			item.count = currentItem:getCount()
-			item.limit = currentItem:getLimit()
-			item.label = currentItem:getLabel()
-			item.name = currentItem:getName()
-			item.metadata = currentItem:getMetadata()
-			item.type = currentItem:getType()
-			item.usable = currentItem:getCanUse()
-			item.canRemove = currentItem:getCanRemove()
-			item.desc = currentItem:getDesc()
-			item.id = currentItem:getId()
-	
-			table.insert(items, item)
-		end
+	for _, item in pairs(UserInventory) do
+		table.insert(items, item)
 	end
 
 	for _, currentWeapon in pairs(UserWeapons) do
@@ -420,7 +406,7 @@ NUIService.LoadInv = function()
 		weapon.metadata = {}
 		weapon.hash = GetHashKey(currentWeapon:getName())
 		weapon.type = "item_weapon"
-		weapon.usable = true
+		weapon.canUse = true
 		weapon.canRemove = true
 		weapon.id = currentWeapon:getId()
 		weapon.used = currentWeapon:getUsed()
@@ -431,7 +417,6 @@ NUIService.LoadInv = function()
 
 	payload.action = "setItems"
 	payload.itemList = items
-	payload.useGold = Config.GoldAsItem
 
 	SendNUIMessage(payload)
 end
@@ -450,13 +435,15 @@ NUIService.CloseInv = function()
 	InInventory = false
 end
 
-NUIService.transactionStarted = function(displaytext)
+NUIService.TransactionStarted = function()
 	SetNuiFocus(true, false)
 	SendNUIMessage({ action = "transaction", type = "started", text = _U("TransactionLoading") })
 end
 
-NUIService.transactionComplete = function()
-	SetNuiFocus(true, true)
+NUIService.TransactionComplete = function(keepInventoryOpen)
+	keepInventoryOpen = keepInventoryOpen == nil and true or keepInventoryOpen
+
+	SetNuiFocus(keepInventoryOpen, keepInventoryOpen)
 	SendNUIMessage({ action = "transaction", type = "completed" })
 end
 

@@ -1188,7 +1188,7 @@
                         }
                     })
                 }
-                if (item.usable) {
+                if (item.canUse) {
                     data.push({
                         text: "Use",
                         action: function () {
@@ -1228,11 +1228,7 @@
 
                 $("#item-" + index).hover(
                     function() {
-                        if (item.metadata.description == undefined) {
-                            OverSetTitle(item.label);
-                        } else {
-                            OverSetTitle(`${item.label}: ${item.metadata.description}`);
-                        }
+                        OverSetTitle(item.label);
                     },
                     function () {
                         OverSetTitle(" ");
@@ -1241,7 +1237,7 @@
 
                 $("#item-" + index).hover(
                     function () {
-                        OverSetDesc(item.desc);
+                        OverSetDesc(!!item.metadata.description ? item.metadata.description : item.label);
                     },
                     function () {
                         OverSetDesc(" ");
