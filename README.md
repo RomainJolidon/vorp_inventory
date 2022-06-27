@@ -24,6 +24,18 @@
 ![image](https://user-images.githubusercontent.com/87246847/156600012-3901dac7-73f8-4577-a8f5-9a60d7e3150b.png)
 <img width="354" alt="image" src="https://user-images.githubusercontent.com/87246847/156600211-cc3fc70f-60bb-4884-971a-1d2ad4fdb8ad.png">
 
+## Extra Features
+* All features from vorp_inventory_lua 1.0.7
+* Description of all items in DB
+* Gold item like Dollars (You can give and drop item)
+
+- You can choose if using Gold like Dollars in config.lua and config.js
+
+- Added descriptions of each item in inventory, for items (desc is in DB), for weapons (desc is in config.lua), for dollars and gold (desc are in html)
+
+![image](https://i.imgur.com/iJ7Baka.png)
+<img width="354" alt="image" src="https://i.imgur.com/WVXkdJu.png">
+<img width="354" alt="image" src="https://i.imgur.com/ZS6BjWI.png">
 
 ## Wiki
 [Wiki VORP Inventory](http://docs.vorpcore.com:3000/vorp-inventory)

@@ -19,4 +19,5 @@ Locales["fr_lang"] = {
     weppickup         = "Arme ramassée",
     itempickup        = "Article ramassé",
     itempickup2       = "Ramassé: ",
+    TransactionLoading= "Attendez..."
 }

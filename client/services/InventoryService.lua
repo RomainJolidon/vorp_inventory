@@ -19,7 +19,8 @@ InventoryService.receiveItem = function (name, amount)
 		name = name,
 		type = "item_standard",
 		canUse = true,
-		canRemove = DB_Items[name].can_remove
+		canRemove = DB_Items[name].can_remove,
+		desc = DB_Items[name].desc
 	})
 	NUIService.LoadInv()
 end
@@ -51,7 +52,8 @@ InventoryService.receiveWeapon = function (id, propietary, name, ammos)
 			label = Utils.GetWeaponLabel(name),
 			ammo = weaponAmmo,
 			used = false,
-			used2 = false
+			used2 = false,
+			desc = Utils.GetWeaponDesc(name)
 		})
 
 		UserWeapons[newWeapon:getId()] = newWeapon
@@ -78,7 +80,8 @@ InventoryService.processItems = function (items)
 			limit = item.limit,
 			can_remove = item.can_remove,
 			type = item.type,
-			usable = item.usable
+			usable = item.usable,
+			desc = item.desc
 		}
 	end
 end
@@ -105,7 +108,8 @@ InventoryService.getLoadout = function (loadout)
 				name = weapon.name,
 				ammo = weaponAmmo,
 				used = weaponUsed,
-				used2 = weaponUsed2
+				used2 = weaponUsed2,
+				desc = Utils.GetWeaponDesc(weapon.name)
 			})
 	
 			UserWeapons[newWeapon:getId()] = newWeapon
@@ -132,6 +136,7 @@ InventoryService.getInventory = function (inventory)
 				local itemCanRemove = item.can_remove
 				local itemType = item.type
 				local itemCanUse = item.usable
+				local itemDesc = item.desc
 
 				local newItem = Item:New({
 					count = itemAmount,
@@ -140,7 +145,8 @@ InventoryService.getInventory = function (inventory)
 					name = itemName,
 					type = itemType,
 					canUse = itemCanUse,
-					canRemove = itemCanRemove
+					canRemove = itemCanRemove,
+					desc = itemDesc
 				})
 
 				UserInventory[itemName] = newItem

@@ -19,4 +19,5 @@ Locales["no_lang"] = {
     weppickup         = "Våpen plukket opp",
     itempickup        = "Varen er hentet",
     itempickup2       = "Plukket opp: ",
+    TransactionLoading= "Vente..."
 }

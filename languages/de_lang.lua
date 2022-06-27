@@ -19,5 +19,6 @@ Locales["de_lang"] = {
     yougaveWeapon     = "Du hast eine Waffe gegeben",
     weppickup         = "Waffe aufgehoben",
     itempickup        = "Artikel abgeholt",
-    itempickup2       = "Abgeholt: "
+    itempickup2       = "Abgeholt: ",
+    TransactionLoading= "Warten..."
 }

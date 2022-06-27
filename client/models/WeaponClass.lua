@@ -8,6 +8,7 @@ Weapon.ammo = {}
 Weapon.components = {}
 Weapon.used = false
 Weapon.used2 = false
+Weapon.desc = nil
 
 function Weapon:UnequipWeapon()
 	local hash = GetHashKey(self.name)
@@ -172,4 +173,12 @@ function FindIndexOf(table, value)
 		end
 	end
 	return false
+end
+
+function Weapon:setDesc(desc)
+	self.desc = desc
+end
+
+function Weapon:getDesc()
+	return self.desc
 end

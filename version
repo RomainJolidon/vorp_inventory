@@ -1,3 +1,11 @@
+<1.0.8>
+- added gold option to drop/give like money check config.
+- added items description check discord on how to add it to items database
+- added weapons description check config
+- fix giving invalid weapon names
+- fix for getsteamid
+- added loading timer when giving items to others to fix the spam give items.
+- update ALL FILES including fxmanifest to get versions checks
 <1.0.7>
 - Bugfix canCarryItem was erroring with invalid items.
 - Server API Feature getItem added!
