@@ -60,6 +60,20 @@ Config = {
     WEAPON_MELEE_KNIFE = {} --WEAPON HASH NAME
   },
 
+   -- items that dont get added up torwards your max weapon count
+   notweapons = {
+    "WEAPON_KIT_BINOCULARS_IMPROVED",
+    "WEAPON_KIT_BINOCULARS",
+    "WEAPON_FISHINGROD",
+    "WEAPON_KIT_CAMERA",
+    "WEAPON_kIT_CAMERA_ADVANCED",
+    "WEAPON_MELEE_LANTERN",
+    "WEAPON_MELEE_DAVY_LANTERN",
+    "WEAPON_MELEE_LANTERN_HALLOWEEN",
+    "WEAPON_KIT_METAL_DETECTOR",
+    "WEAPON_MELEE_HAMMER",
+  },
+
 
   --DON'T TOUCH BESIDES NAME OF WEAPON
   Weapons = {

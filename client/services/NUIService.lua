@@ -203,6 +203,7 @@ NUIService.NUIGiveItem = function(obj)
 					if isProcessingPay then return end
 					isProcessingPay = true
 					TriggerServerEvent("vorpinventory:giveMoneyToPlayer", target, tonumber(data2.count))
+					TriggerServerEvent("vorpinventory:moneylog", target, tonumber(data2.count))
 				elseif Config.UseGoldItem and data2.type == "item_gold" then
 					if isProcessingPay then return end
 					isProcessingPay = true
@@ -338,6 +339,7 @@ NUIService.NUIUseItem = function(data)
 		local isWeaponARevolver = Citizen.InvokeNative(0xC212F1D05A8232BB, GetHashKey(UserWeapons[weaponId]:getName()))
 		local isWeaponAPistol = Citizen.InvokeNative(0xDDC64F5E31EEDAB6, GetHashKey(UserWeapons[weaponId]:getName()))
 		local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId(), 4)
+		local notdual = false
 
 		if (isWeaponARevolver or isWeaponAPistol) and isArmed then
 
@@ -352,9 +354,14 @@ NUIService.NUIUseItem = function(data)
 				UserWeapons[weaponId]:loadComponents()
 				UserWeapons[weaponId]:setUsed(true)
 				TriggerServerEvent("syn_weapons:weaponused", data)
+			else
+				notdual = true
 			end
-		elseif not UserWeapons[weaponId]:getUsed() and
-			not Citizen.InvokeNative(0x8DECB02F88F428BC, PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()), 0, true) then
+		elseif not UserWeapons[weaponId]:getUsed() and not Citizen.InvokeNative(0x8DECB02F88F428BC, PlayerPedId(), GetHashKey(UserWeapons[weaponId]:getName()), 0, true) then
+			notdual = true
+		end
+
+		if notdual then
 			UserWeapons[weaponId]:loadAmmo()
 			UserWeapons[weaponId]:loadComponents()
 			UserWeapons[weaponId]:setUsed(true)

@@ -1,6 +1,17 @@
 InventoryAPI = {}
 UsableItemsFunctions = {}
 
+local function contains(table, element)
+    if table ~= 0 then
+        for k, v in pairs(table) do
+            if string.upper(v) == string.upper(element) then
+                return true
+            end
+        end
+    end
+	return false
+end
+
 InventoryAPI.canCarryAmountWeapons = function(player, amount, cb)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -602,7 +613,9 @@ InventoryAPI.getUserTotalCountWeapons = function(identifier, charId)
 	local userTotalWeaponCount = 0
 	for _, weapon in pairs(UsersWeapons) do
 		if weapon:getPropietary() == identifier and weapon:getCharId() == charId then
-			userTotalWeaponCount = userTotalWeaponCount + 1
+			if not contains(Config.notweapons, weapon:getName()) then
+				userTotalWeaponCount = userTotalWeaponCount + 1
+			end
 		end
 	end
 	return userTotalWeaponCount
