@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS `character_inventories` (
   `created_at` TIMESTAMP DEFAULT now()
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
 
+-- Create inndex to speed up request for each character inventory
+CREATE INDEX character_inventory_idx ON character_inventories(character_id, inventory_type);
+
 -- Convert Json items into separate rows and insert them in items_crafted
 INSERT INTO items_crafted (
       character_id,

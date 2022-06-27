@@ -231,51 +231,74 @@ InventoryService.usedWeapon = function(id, _used, _used2)
 	end)
 end
 
-InventoryService.subItem = function(target, name, amount)
+InventoryService.subItem = function(target, itemId, amount)
 	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	local charIdentifier = sourceCharacter.charIdentifier
 
 	if UsersInventories[identifier] ~= nil then
-		if UsersInventories[identifier][name] ~= nil then
-			if amount <= UsersInventories[identifier][name]:getCount() then
-				UsersInventories[identifier][name]:quitCount(amount)
+		if UsersInventories[identifier][itemId] ~= nil then
+			local item = UsersInventories[identifier][itemId]
+			if item ~= nil then
+				if amount <= item:getCount() then
+					item:quitCount(amount)
+				end
+	
+				if item:getCount() == 0 then
+					UsersInventories[identifier][itemId] = nil
+					DbService.DeleteItem(charIdentifier, itemId)
+				else
+					DbService.SetItemAmount(charIdentifier, itemId, item:getCount())
+				end
+				--InventoryAPI.SaveInventoryItemsSupport(_source)
 			end
-
-			if UsersInventories[identifier][name]:getCount() == 0 then
-				UsersInventories[identifier][name] = nil
-			end
-			InventoryAPI.SaveInventoryItemsSupport(_source)
 		end
 	end
 end
 
-InventoryService.addItem = function(target, name, amount)
+InventoryService.addItem = function(target, name, amount, metadata, cb)
 	local _source = target
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
+	local charIdentifier = sourceCharacter.charIdentifier
+	metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata or {})
 
 	if UsersInventories[identifier] ~= nil then
-		if UsersInventories[identifier][name] ~= nil then
+		local item = SvUtils.FindItemByNameAndMetadata(identifier, name, metadata)
+		if item ~= nil then
 			if amount > 0 then
-				UsersInventories[identifier][name]:addCount(amount)
-				InventoryAPI.SaveInventoryItemsSupport(_source)
+				item:addCount(amount)
+				DbService.SetItemAmount(charIdentifier, item:getId(), item:getCount())
+				cb(item)
+				return
 			end
+			cb(nil)
+			return
 		else
 			if svItems[name] ~= nil then
-				UsersInventories[identifier][name] = Item:New({
-					count = amount,
-					limit = svItems[name]:getLimit(),
-					label = svItems[name]:getLabel(),
-					name = name,
-					type = "item_inventory",
-					canUse = svItems[name]:getCanUse(),
-					canRemove = svItems[name]:getCanRemove()
-				})
-				InventoryAPI.SaveInventoryItemsSupport(_source)
+				DbService.CreateItem(charIdentifier, svItems[name]:getId(), amount, metadata, function (craftedItem)
+					UsersInventories[identifier][craftedItem.id] = Item:New({
+						id = craftedItem.id,
+						count = amount,
+						limit = svItems[name]:getLimit(),
+						label = svItems[name]:getLabel(),
+						metadata = SharedUtils.MergeTables(svItems[name]:getMetadata(), metadata),
+						name = name,
+						type = "item_standard",
+						canUse = svItems[name]:getCanUse(),
+						canRemove = svItems[name]:getCanRemove()
+					})
+					cb(item)
+				end)
+				return
 			end
+			cb(nil)
+			return
 		end
 	end
+
+	cb(nil)
 end
 
 InventoryService.addWeapon = function(target, weaponId)
@@ -318,46 +341,59 @@ InventoryService.onPickup = function(obj)
 	if SvUtils.InProcessing(_source) then
 		return
 	end
-
+	
 	SvUtils.ProcessUser(_source)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 
-	if UsersInventories[identifier] ~= nil then
-		if svItems[name]:getLimit() ~= -1 then
-			if ItemPickUps[obj].weaponid == 1 then
-				if UsersInventories[identifier][name] ~= nil then
-					local sourceItemCount = UsersInventories[identifier][name]:getCount()
-					local totalAmount = amount + sourceItemCount
+	if ItemPickUps[obj] ~= nil then
+		local name = ItemPickUps[obj].name
+		local amount = ItemPickUps[obj].amount
+		local metadata = ItemPickUps[obj].metadata
 
-					if svItems[name]:getLimit() < totalAmount then
-						TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
-						return
+			if ItemPickUps[obj].weaponid == 1 then
+
+			if UsersInventories[identifier] ~= nil then
+				if svItems[name]:getLimit() ~= -1 then
+					local item = SvUtils.FindItemByNameAndMetadata(identifier, name, metadata)
+
+					if item ~= nil then
+						--local sourceItemCount = UsersInventories[identifier][name]:GetCount()
+						local totalAmount = amount + item:getCount()
+
+						if svItems[name]:getLimit() < totalAmount then
+							TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
+							return
+						end
+					end
+
+					if Config.MaxItemsInInventory.Items ~= 0 then
+						local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier)
+						sourceInventoryItemCount = sourceInventoryItemCount + amount
+
+						if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
+							TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
+							return
+						end
 					end
 				end
+
+				InventoryService.addItem(_source, name, amount, metadata, function (item)
+					if item ~= nil then
+						local title = _U('itempickup')
+						local description = _U('itempickup2') .. amount .. " " .. name
+						Discord(title, _source, description)
+
+						TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, ItemPickUps[obj].obj, amount, metadata, ItemPickUps[obj].coords, 2)
+						TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
+						TriggerClientEvent("vorpInventory:receiveItem", _source, name, item:getId(), amount, metadata)
+						TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
+		
+						ItemPickUps[obj] = nil
+					end
+				end)
 			end
-
-			if Config.MaxItemsInInventory.Items ~= 0 then
-				local sourceInventoryItemCount = InventoryAPI.getUserTotalCount(identifier)
-				sourceInventoryItemCount = sourceInventoryItemCount + amount
-
-				if sourceInventoryItemCount > Config.MaxItemsInInventory.Items then
-					TriggerClientEvent("vorp:TipRight", _source, _U("fullInventory"), 2000)
-					return
-				end
-			end
-
-			InventoryService.addItem(_source, name, amount)
-			local title = _U('itempickup')
-			local description = _U('itempickup2') .. amount .. " " .. name
-			Discord(title, _source, description)
-			TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, ItemPickUps[obj].obj, amount, ItemPickUps[obj].coords, 2)
-			TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
-			TriggerClientEvent("vorpInventory:receiveItem", _source, name, amount)
-			TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
-
-			ItemPickUps[obj] = nil
 		else
 			if Config.MaxItemsInInventory.Weapons ~= 0 then
 				local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + 1
@@ -367,18 +403,34 @@ InventoryService.onPickup = function(obj)
 					local weaponObj = ItemPickUps[obj].obj
 					InventoryService.addWeapon(_source, weaponId)
 
-					local title = _U('weppickup')
-					local description = _U('itempickup2') .. UsersWeapons[weaponId]:getName()
-
-					Discord(title, _source, description)
 					TriggerEvent("syn_weapons:onpickup", weaponId)
-					TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
+					TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, weaponObj, 1, metadata, ItemPickUps[obj].coords, 2, weaponId)
 					TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
 					TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
 					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
+
 					ItemPickUps[obj] = nil
-				else
-					TriggerClientEvent("vorp:TipRight", _source, _U("fullInventoryWeapon"), 2000)
+				end
+			else
+				if Config.MaxItemsInInventory.Weapons ~= 0 then
+					local sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + 1
+
+					if sourceInventoryWeaponCount <= Config.MaxItemsInInventory.Weapons then
+						local weaponId = ItemPickUps[obj].weaponid
+						local weaponObj = ItemPickUps[obj].obj
+						InventoryService.addWeapon(_source, weaponId)
+						local title = _U('weppickup')
+						local description = _U('itempickup2') .. UsersWeapons[weaponId]:getName()
+						Discord(title, _source, description)
+						TriggerEvent("syn_weapons:onpickup", weaponId)
+						TriggerClientEvent("vorpInventory:sharePickupClient", -1, name, weaponObj, 1, ItemPickUps[obj].coords, 2, weaponId)
+						TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
+						TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, UsersWeapons[weaponId]:getPropietary(), UsersWeapons[weaponId]:getName(), UsersWeapons[weaponId]:getAllAmmo())
+						TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
+						ItemPickUps[obj] = nil
+					else
+						TriggerClientEvent("vorp:TipRight", _source, _U("fullInventoryWeapon"), 2000)
+					end
 				end
 			end
 		end
@@ -473,7 +525,7 @@ InventoryService.DropWeapon = function(weaponId)
 	end
 end
 
-InventoryService.DropItem = function(itemName, amount)
+InventoryService.DropItem = function(itemName, itemId, amount, metadata)
 	local _source = source
 
 	if not SvUtils.InProcessing(_source) then
@@ -680,35 +732,45 @@ InventoryService.getInventory = function()
 
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
-	local sourceInventory = json.decode(sourceCharacter.inventory)
 
 	local characterInventory = {}
 
-	if sourceInventory ~= nil then
-		for _, item in pairs(DB_Items) do -- TODO reverse loop: Iterate on inventory item instead of DB_items. Should save some iterations STILL TODO?
-			if sourceInventory[item.item] ~= nil then
-				local newItem = Item:New({
-					count = tonumber(sourceInventory[item.item]),
-					limit = item.limit,
-					label = item.label,
-					name = item.item,
-					type = item.type,
-					canUse = item.usable,
-					canRemove = item.can_remove,
-				})
-				characterInventory[item.item] = newItem
+	if sourceCharId ~= nil then
+		exports.ghmattimysql:execute("SELECT ic.id, i.item, ci.amount, ic.metadata, ci.created_at FROM items_crafted ic\
+		LEFT JOIN character_inventories ci on ic.id = ci.item_crafted_id\
+		LEFT JOIN items i on ic.item_id = i.id\
+		WHERE ci.inventory_type = 'default'\
+		  AND ci.character_id = @charid;", {
+			['charid'] = sourceCharId
+		}, function (result)
+			if result ~= nil then
+				for _, item in pairs(result) do
+					if svItems[item.item] ~= nil then
+						local dbItem = svItems[item.item]
+						characterInventory[item.id] = Item:New({
+							count = tonumber(item.amount),
+							id = item.id,
+							limit = dbItem.limit,
+							label = dbItem.label,
+							metadata = SharedUtils.MergeTables(dbItem.metadata, item.metadata),
+							name = dbItem.item,
+							type = dbItem.type,
+							canUse = dbItem.usable,
+							canRemove = dbItem.can_remove,
+							createdAt = item.created_at
+						})
+					end
+				end
+	
+				UsersInventories[sourceIdentifier] = characterInventory
+				TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(result))
 			end
-		end
-	end
-	UsersInventories[sourceIdentifier] = characterInventory
-
-	TriggerClientEvent("vorpInventory:giveInventory", _source, json.encode(sourceInventory))
-
-	exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', {
-		['identifier'] = sourceIdentifier,
-		['charid'] = sourceCharId,
-	},
-		function(result)
+		end)
+	
+		exports.ghmattimysql:execute('SELECT * FROM loadout WHERE identifier = @identifier AND charidentifier = @charid', {
+			['identifier'] = sourceIdentifier,
+			['charid'] = sourceCharId,
+		}, function(result)
 			if result ~= nil then
 				for _, weapon in pairs(result) do
 					local db_Ammo = json.decode(weapon.ammo)
@@ -738,5 +800,8 @@ InventoryService.getInventory = function()
 				end
 				TriggerClientEvent("vorpInventory:giveLoadout", _source, result)
 			end
+			UsersInventories[sourceIdentifier] = characterInventory
+			TriggerClientEvent("vorpInventory:giveInventory", _source, result[1].items)
 		end)
+	end
 end

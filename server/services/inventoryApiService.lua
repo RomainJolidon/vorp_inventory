@@ -155,6 +155,7 @@ InventoryAPI.getInventory = function(player, cb)
 
 		for _, item in pairs(UsersInventories[identifier]) do
 			local newItem = {
+				id= item:getId(),
 				label = item:getLabel(),
 				name = item:getName(),
 				metadata = item:getMetadata(),

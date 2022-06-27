@@ -143,7 +143,7 @@ end
 InventoryService.getInventory = function (inventory)
 	UserInventory = {}
 	
-	if inventory ~= '' then
+	if inventory ~= nil and inventory ~= '' then
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do

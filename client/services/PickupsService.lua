@@ -47,7 +47,6 @@ PickupsService.createPickup = function(name, amount, metadata, weaponId)
 
 	TriggerServerEvent("vorpinventory:sharePickupServer", name, entityHandle, amount, metadata, position, weaponId)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
-
 end
 
 PickupsService.createMoneyPickup = function(amount)
